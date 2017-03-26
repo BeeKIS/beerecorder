@@ -1,4 +1,4 @@
-import sys, os, time
+import sys
 import numpy as np
 import matplotlib
 # matplotlib.use('Qt4Agg')  # this prevents hickups in new matplotlib versions
@@ -6,8 +6,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 
 class AudioDisplay(QtWidgets.QGroupBox):

@@ -4,7 +4,7 @@ a class for connecting gui, hardware and experiments
 
 import sys
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtCore
 from collections import OrderedDict
 
 from AudioDev import AudioDev

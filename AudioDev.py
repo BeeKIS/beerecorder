@@ -1,14 +1,13 @@
-import sys, os, time
+import os
 import pyaudio
-# import wave
 import numpy as np
 from ctypes import *
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from collections import deque
 from matplotlib.dates import date2num
 import soundfile as sf
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 
 
 def show_available_input_devices():

@@ -5,9 +5,9 @@ a class for controlling experiments like bulk playbacks of videofiles
 import sys
 import shutil
 import os
-from datetime import date, datetime, timedelta
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from datetime import datetime
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 
 
 class ExperimentControl(QtCore.QObject):

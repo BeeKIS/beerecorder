@@ -10,9 +10,8 @@ debug = False
 
 # ######################################################
 
-import sys, os, time
-import wave
-from datetime import date, datetime, timedelta
+import sys, os
+from datetime import datetime
 
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets

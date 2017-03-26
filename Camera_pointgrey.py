@@ -6,8 +6,8 @@ import numpy as np
 import cv2
 from collections import deque
 from matplotlib.dates import date2num
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 
 from VideoRecording import VideoRecording
 

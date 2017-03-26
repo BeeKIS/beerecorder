@@ -1,4 +1,4 @@
-import os, sys
+import os
 from PIL import Image
 from datetime import datetime
 from PyQt5 import QtGui, QtCore, QtWidgets

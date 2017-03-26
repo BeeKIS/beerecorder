@@ -1,15 +1,12 @@
-import sys, os, time
+import os
 import pyaudio
 import wave
 import numpy as np
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from collections import deque
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 def show_available_output_devices():
     audio = pyaudio.PyAudio()
@@ -21,6 +18,7 @@ def show_available_output_devices():
             chans = audio.get_device_info_by_host_api_device_index(0,i).get('maxOutputChannels')
             name = audio.get_device_info_by_host_api_device_index(0,i).get('name')
             print("Output Device id: {} - {} - channels: {}".format(i, name, chans))
+
 
 class AudioDevOut(QtCore.QObject):
     # signals

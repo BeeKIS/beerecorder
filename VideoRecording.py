@@ -3,8 +3,8 @@ import os
 import numpy as np
 import subprocess as sp
 import pickle
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtCore
+from PyQt5.QtCore import pyqtSignal
 
 
 def get_encoder():

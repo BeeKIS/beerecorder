@@ -1,10 +1,8 @@
 import os, sys
 from PIL import Image
 from datetime import datetime
-import numpy as np
-from PIL import ImageQt as iqt
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt
 
 
 class VideoTab(QtWidgets.QWidget):
@@ -210,13 +208,7 @@ class VideoCanvas(QtWidgets.QLabel):
         # display frame
         image = QtGui.QImage(frame.ravel(), frame.shape[1],frame.shape[0], form)
         pixmap = QtGui.QPixmap(image)
-        # pixmap = QtGui.QPixmap.fromImage(iqt.ImageQt(Image.fromarray(frame).convert('RGB')))
 
         self.setPixmap(pixmap.scaled(self.size(), Qt.KeepAspectRatio))
 
-    # def resizeEvent(self, QResizeEvent):
-    #     """ override in-built Qt function """
-    #     self.resizeImage()
 
-    # def resizeImage(self):
-    #     self.setPixmap(self.pixmap.scaled(self.size(), Qt.KeepAspectRatio))

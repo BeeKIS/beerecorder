@@ -1,15 +1,13 @@
 """
 a class for connecting gui, hardware and experiments
 """
-
-import shutil
 import sys
 import os
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from optparse import OptionParser
 import numpy as np
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 from Devices import Devices
 from ExperimentControl import ExperimentControl
@@ -62,9 +60,9 @@ class Control(QtCore.QObject):
     last_framerate = 0
 
     rec_info = dict(rec_info='',
-                         rec_start='',
-                         rec_end='',
-                         comments=list())
+                    rec_start='',
+                    rec_end='',
+                    comments=list())
 
     audio_playback = False
     audio_playback_file = ''
@@ -100,7 +98,6 @@ class Control(QtCore.QObject):
         self.restart_dts = list()
         self.programmed_stop_dt = None
         self.starttime = None
-
 
     def handle_options(self):
         parser = OptionParser()

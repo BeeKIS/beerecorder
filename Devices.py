@@ -2,13 +2,9 @@
 a class for connecting gui, hardware and experiments
 """
 
-import shutil
-import os
 import sys
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-
 from collections import OrderedDict
 
 from AudioDev import AudioDev
@@ -21,8 +17,6 @@ if camera_modules['opencv']:
 if camera_modules['pointgrey']:
     from Camera_pointgrey import Camera as pgCamera
     from Camera_pointgrey import get_available_flycap_cameras
-
-from ExperimentControl import ExperimentControl
 
 
 class Devices(QtCore.QObject):

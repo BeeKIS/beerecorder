@@ -1,14 +1,10 @@
-#! /usr/bin/env python
-__author__ = 'Joerg Henninger; joerg.henninger@posteo.de'
+#! /usr/bin/env python3
 
-"""
-TODO
-- config dialogs for recording devices
-    - set and indicate ROI
-    - set framerate
-- add info on resolution
-- add tool to estimate frame write speed for a chose resoution
-"""
+# TODO: config dialogs for recording devices
+# TODO: set and indicate ROI
+# TODO: set frame rate
+# TODO: add info on resolution
+# TODO: add tool to estimate frame write speed for a chosen resolution
 
 debug = False
 
@@ -16,11 +12,7 @@ debug = False
 
 import sys, os, time
 import wave
-
 from datetime import date, datetime, timedelta
-import numpy as np
-from PIL import Image as image
-from PIL import ImageQt as iqt
 
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
@@ -36,6 +28,9 @@ from VideoCanvas import VideoTab
 
 # ######################################################
 
+__author__ = 'Joerg Henninger; joerg.henninger@posteo.de'
+
+# ######################################################
 
 class Main(QtWidgets.QMainWindow):
 

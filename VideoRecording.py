@@ -7,34 +7,34 @@ import numpy as np
 # else:
 #     import subprocess as sp
 import subprocess as sp
-import cPickle as pickle
+import pickle
 
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+
 
 def get_encoder():
     if os.name == 'posix':
-        pathlist = ['/usr/bin/avconv', '/usr/bin/ffmpeg']
+        pathlist = ['/usr/bin/avconv', '/usr/bin/ffmpeg']#, '/usr/local/Cellar/ffmpeg/3.2.2/bin/ffmpeg']
         for p in pathlist:
             if os.path.exists(p):
                 return p
         else:
-            sys.exit('No encoder found')
-        return p
+            sys.exit('No encoder found. Check path! Provide correct symlinks. If on Os X, check your HomeBrew cellar!')
     else:
         pathlist = ["C:/Program Files/ffmpeg/bin/ffmpeg.exe",
                     "C:/Program Files (x86)/ffmpeg/bin/ffmpeg.exe"]
         for p in pathlist:
             if os.path.exists(p):
-                return p
-                break
+                return
         else:
             sys.exit('No encoder found')
 
 encoder_path = get_encoder()
+
 
 class VideoRecording(QtCore.QObject):
     # signals
@@ -126,7 +126,7 @@ class VideoRecording(QtCore.QObject):
             return
 
     def write_metadata(self, current_datetime):
-        with open(self.metadata_fn, 'ab') as f:
+        with open(self.metadata_fn, 'a') as f:
             f.write(current_datetime)
             f.flush()
 

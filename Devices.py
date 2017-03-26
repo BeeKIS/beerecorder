@@ -9,7 +9,7 @@ import sys
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 from AudioDev import AudioDev
@@ -86,7 +86,7 @@ class Devices(QtCore.QObject):
             print('Number of flycap-cameras: {}'.format(cam_num))
 
             # put cameras into dictionary
-            for j in xrange(cam_num):
+            for j in range(cam_num):
                 cam = pgCamera(self.control, j, fast_and_small_video=self.control.cfg['fast_and_small_video'],
                              triggered=self.control.cfg['trigger'])
                 cam.name = str(j)

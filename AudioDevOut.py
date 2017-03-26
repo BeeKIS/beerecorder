@@ -8,7 +8,7 @@ from collections import deque
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 def show_available_output_devices():
@@ -170,7 +170,7 @@ class AudioDevOut(QtCore.QObject):
 
     def get_dispdatachunk(self):
         self.mutex.lock()
-        data = [self.dispdatachunks.popleft() for i in xrange(len(self.dispdatachunks))]
+        data = [self.dispdatachunks.popleft() for i in range(len(self.dispdatachunks))]
         self.mutex.unlock()
         return data
 

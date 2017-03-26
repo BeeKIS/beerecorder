@@ -7,23 +7,21 @@ from datetime import date, datetime, timedelta
 from collections import deque
 from matplotlib.dates import date2num
 import soundfile as sf
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 def show_available_input_devices():
     audio = pyaudio.PyAudio()
     info = audio.get_host_api_info_by_index(0)
     numdevices = info.get('deviceCount')
     print('\n## Input Devices ##')
-    for i in range (0,numdevices):
-        if audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels')>0:
+    for i in range(0, numdevices):
+        if audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels') > 0:
             chans = audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels')
             name = audio.get_device_info_by_host_api_device_index(0,i).get('name')
             print("Input Device id: {} - {} - channels: {}".format(i, name, chans))
+
 
 class AudioDev(QtCore.QObject):
 
@@ -84,9 +82,9 @@ class AudioDev(QtCore.QObject):
         info = self.audio.get_host_api_info_by_index(0)
         numdevices = info.get('deviceCount')
         for i in range (0,numdevices):
-            if self.audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels')>0:
+            if self.audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels') > 0:
                 name = self.audio.get_device_info_by_host_api_device_index(0,i).get('name')
-                if self.control.debug > 0:print("Input Device id {} - {}".format(i, name))
+                if self.control.debug > 0: print("Input Device id {} - {}".format(i, name))
                 if devname in name:
                     return i, True
         else:
@@ -108,7 +106,7 @@ class AudioDev(QtCore.QObject):
         index, ok = self.get_input_device_index_by_name(self.capture_device_name)
         if ok:
             self.in_device = self.audio.get_device_info_by_index(index)
-            print 
+            print()
         else:
             if self.control.cfg['use_hydro']:  # enforce the use of the hydrophone and break if it is not available
                 error = 'Audio device not found.'
@@ -241,7 +239,7 @@ class AudioDev(QtCore.QObject):
 
     def get_dispdatachunk(self):
         self.mutex.lock()
-        data = [self.dispdatachunks.popleft() for i in xrange(len(self.dispdatachunks))]
+        data = [self.dispdatachunks.popleft() for i in range(len(self.dispdatachunks))]
         self.mutex.unlock()
         return data
 

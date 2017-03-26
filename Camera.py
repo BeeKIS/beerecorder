@@ -1,5 +1,6 @@
 import sys
 import warnings
+import cv2
 from datetime import datetime
 from collections import deque
 from matplotlib.dates import date2num
@@ -7,19 +8,21 @@ from matplotlib.dates import date2num
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 from VideoRecording import VideoRecording
 
 __author__ = 'Fabian Sinz, Joerg Henninger'
-import cv2
+
 
 def brg2rgb(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+
 def brg2grayscale(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
 
 class Camera(QtCore.QObject):
     def __init__(self, main, device_no=0, color=False, post_processor=None, parent=None):

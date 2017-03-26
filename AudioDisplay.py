@@ -6,12 +6,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.ticker import MultipleLocator
 import matplotlib.pyplot as plt
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError as details:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 class AudioDisplay(QtWidgets.QGroupBox):
     mutex = QtCore.QMutex()
@@ -278,7 +275,7 @@ def ticks_outward(ax, tickshift = -0.015, two_y_scales=False, pad=8):
         line.set_marker(mpllines.TICKLEFT)
 
 def box_off(ax, two_y_scales=False):
-    for loc, spine in ax.spines.iteritems():
+    for loc, spine in ax.spines.items():
         if loc in ['left', 'bottom']:
             pass
         elif loc in ['right', 'top']:

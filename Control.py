@@ -8,13 +8,8 @@ import os
 from datetime import date, datetime, timedelta
 from optparse import OptionParser
 import numpy as np
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
-    print(details)
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from Devices import Devices
 from ExperimentControl import ExperimentControl
@@ -23,10 +18,10 @@ cfg = dict(audio_input=False,
            audio_output=False,
            video_input=True,
            audio_input_channels=2,
-           audio_input_samplerate=96000,
+           audio_input_samplerate=48000,
            audio_input_chunksize=2048,
-           use_hydro=False, 
-           # use_hydro=True, 
+           use_hydro=False,
+           # use_hydro=True,
            audio_output_chunksize=2048,
            pointgrey = False,
            fast_and_small_video=True,
@@ -70,7 +65,7 @@ class Control(QtCore.QObject):
                          rec_start='',
                          rec_end='',
                          comments=list())
- 
+
     audio_playback = False
     audio_playback_file = ''
 
@@ -172,7 +167,7 @@ class Control(QtCore.QObject):
             if os.path.exists(self.options.audio_playback):
                 self.audio_playback_file = self.options.audio_playback
                 if not os.path.exists(self.options.audio_playback):
-                    print('Output audio-file does not exist')                    
+                    print('Output audio-file does not exist')
                     self.close()
                 self.cfg['audio_output'] = True
 
@@ -186,8 +181,8 @@ class Control(QtCore.QObject):
         # self.audio_channels = self.options.audio_channels
 
         if self.options.show_devices:
-            from audiodev import show_available_input_devices
-            from audiodevOut import show_available_output_devices
+            from AudioDev import show_available_input_devices
+            from AudioDevOut import show_available_output_devices
 
             show_available_input_devices()
             show_available_output_devices()
@@ -234,7 +229,7 @@ class Control(QtCore.QObject):
         try:
             os.mkdir(self.save_dir)
         except:
-            print 'start new recording:', self.save_dir
+            print('start new recording:', self.save_dir)
             print('creation of output directory failed')
             self.close()
 
@@ -275,7 +270,7 @@ class Control(QtCore.QObject):
         self.prepare_other_recordings(self.file_counter)
         if self.cfg['audio_input']:
             self.devices.audiodev.prepare_recording(self.save_dir, self.file_counter)
- 
+
         if self.cfg['audio_output']:
             print('\n# Playing file: {}'.format(os.path.basename(self.audio_playback_file)))
             self.devices.audiodevout.open(self.audio_playback_file)
@@ -309,7 +304,7 @@ class Control(QtCore.QObject):
         # query info on recording
         dlg =  QtWidgets.QInputDialog()
         dlg.setInputMode(QtWidgets.QInputDialog.TextInput)
-        dlg.setLabelText('Info on recording:')                        
+        dlg.setLabelText('Info on recording:')
         dlg.setWindowTitle('Info on recording')
         dlg.resize(500,200)
         ok = dlg.exec_()  # shows the dialog
@@ -325,11 +320,11 @@ class Control(QtCore.QObject):
         recording_info_fn = 'recording_info.txt'
         fn = os.path.join(self.save_dir, recording_info_fn)
         with open(fn, 'w') as f:
-            f.write(u'recording info: {0}\n'.format(self.rec_info['rec_info']).encode("utf-8"))
-            f.write(u'starttime: {0}\n'.format(self.rec_info['rec_start']).encode("utf-8"))
-            f.write(u'endtime: {0}\n'.format(self.rec_info['rec_end']).encode("utf-8"))
+            f.write('recording info: {0}\n'.format(self.rec_info['rec_info']))#.encode("utf-8"))
+            f.write('starttime: {0}\n'.format(self.rec_info['rec_start']))#.encode("utf-8"))
+            f.write('endtime: {0}\n'.format(self.rec_info['rec_end']))#.encode("utf-8"))
             for c in self.rec_info['comments']:
-                f.write(u'comment: {0}\n'.format(c).encode("utf-8"))
+                f.write('comment: {0}\n'.format(c))#.encode("utf-8"))
 
     def stop_all_saving(self, restart=False):
         if not self.saving:
@@ -381,7 +376,7 @@ class Control(QtCore.QObject):
         now = datetime.now()
         midnight_yesterday = datetime(now.year, now.month, now.day)
         midnight_today = datetime(now.year, now.month, now.day)+timedelta(hours=24)
-        
+
         self.restart_dts = list()
         for mi in self.restart_times:
             new_dt = midnight_yesterday + timedelta(minutes=mi)
@@ -441,21 +436,21 @@ class Control(QtCore.QObject):
             cam.close()
 
     def set_timestamp(self, s):
-        print(u'Timestamp: {}'.format(s))
-        
+        print('Timestamp: {}'.format(s))
+
         if self.save_dir is None: return
         if not len(self.save_dir): return
         if self.debug > 0:
-            print(u'timestamp: {}'.format(s))
-        timestamp_fn = u'{:04d}_timestamps.txt'.format(self.file_counter)
+            print('timestamp: {}'.format(s))
+        timestamp_fn = '{:04d}_timestamps.txt'.format(self.file_counter)
         fn = os.path.join(self.save_dir, timestamp_fn)
         with open(fn, 'a') as f:
-            f.write(s.encode("utf-8")+'\n')
+            f.write(s+'\n')
         self.rec_info['comments'].append(s)
 
     def raise_warning(self, s):
         e = '\n'+80*'#'+'\n'
-        print(e+u'Warning raised: {}'.format(s)+e)
+        print(e+'Warning raised: {}'.format(s)+e)
 
     def raise_error(self, s):
         e = '\n'+80*'#'+'\n'

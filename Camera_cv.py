@@ -1,26 +1,40 @@
-import sys, os
+import sys
 import warnings
+import cv2
 from datetime import datetime
 from collections import deque
 from matplotlib.dates import date2num
-import numpy as np
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+
+try:
+    from PyQt5 import QtGui, QtCore, QtWidgets
+    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+except ImportError:
+    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 from VideoRecording import VideoRecording
 
-__author__ = 'Joerg Henninger'
+__author__ = 'Fabian Sinz, Joerg Henninger'
+
+
+
+def brg2rgb(frame):
+    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+
+def brg2grayscale(frame):
+    return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
 
 class Camera(QtCore.QObject):
     # signals
+    sig_new_frame = QtCore.pyqtSignal()
     sig_start_rec = pyqtSignal()
     sig_set_timestamp = pyqtSignal(object)
     sig_raise_error = pyqtSignal(object)
 
-    def __init__(self, control, device_no=0, post_processor=None, parent=None):
+    def __init__(self, control, device_no=0, color=False, post_processor=None, parent=None):
         """
         Initializes a new camera
-
         :param post_processor: function that is applies to the frame after grabbing
         """
         QtCore.QObject.__init__(self, parent)
@@ -30,13 +44,14 @@ class Camera(QtCore.QObject):
         self.filename = 'video'
         self.framerate = 30.
         self.triggered = False
+        self.color = color
         self.capture = None
         self.device_no = device_no
         self.name = None
         self.recording = None
         self.post_processor = post_processor
         if post_processor is None:
-            self.post_processor = lambda *args:  args
+            self.post_processor = lambda *args: args
 
         self.saving = False
 
@@ -44,26 +59,55 @@ class Camera(QtCore.QObject):
         self.recframes = deque()
         self.dispframe = None
 
-        self.x_resolution = 800
-        self.y_resolution = 800
+        self.open()
 
-        # self.open()
-
-        # create timer for independent frame acquisition
+        # # create timer for independent frame acquisition
         # self.timer = QtCore.QTimer()
-        # self.timer.timeout.connect(self.grab_frame)
+        # self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.grab_frame)
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
 
+    def __enter__(self):
+        self.open()
+        return self
+
     def __exit__(self, type, value, traceback):
         self.close()
 
+    def open(self):
+        capture = cv2.VideoCapture(self.device_no)
+        self.capture = capture
+        # try to increase the resolution of the frame capture; default is 640x480
+        # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
+        # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
+        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
     def is_working(self):
-        return True
+        return self.capture.isOpened()
+
+    def get_properties(self):
+        """
+        :returns: the properties (cv2.cv.CV_CAP_PROP_*) from the camera
+        :rtype: dict
+        """
+        if self.capture is not None:
+            properties = [e for e in dir(cv2) if "CV_CAP_PROP" in e]
+            ret = {}
+            for e in properties:
+                ret[e[12:].lower()] = self.capture.get(getattr(cv2, e))
+            return ret
+        else:
+            warnings.warn("Camera needs to be opened first!")
+            return None
 
     def get_resolution(self):
-        return self.x_resolution, self.y_resolution
+        if self.capture is not None:
+            return int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)), \
+                   int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        else:
+            raise ValueError("Camera is not opened or not functional! Capture is None")
 
     def get_dispframe(self):
         self.mutex.lock()
@@ -73,12 +117,14 @@ class Camera(QtCore.QObject):
         return dispframe
 
     def get_recframe(self):
+        self.mutex.lock()
         if len(self.recframes):
-            self.mutex.lock()
             recframe = self.recframes.popleft()
+            # print(len(self.recframes))
             self.mutex.unlock()
             return recframe
         else:
+            self.mutex.unlock()
             return None
 
     def get_recframesize(self):
@@ -89,10 +135,8 @@ class Camera(QtCore.QObject):
         return s
 
     def grab_frame(self, saving=False):
-        QtCore.QThread.msleep(int(1000./self.framerate))
         # grab frame
-        frame = (np.random.random(self.y_resolution*self.x_resolution)*255).reshape((self.y_resolution,self.x_resolution))
-        frame=np.require(frame, np.uint8, 'C')
+        flag, frame = self.capture.read()
         dtime = datetime.now()
 
         # calculate framerate
@@ -100,10 +144,28 @@ class Camera(QtCore.QObject):
         if len(self.frame_dts) > 100:
             self.frame_dts.popleft()
         if len(self.frame_dts) > 1:
-            dur = (self.frame_dts[-1]-self.frame_dts[0]).total_seconds()
-            fr = len(self.frame_dts)/dur if dur > 0 else 0
+            dur = (self.frame_dts[-1] - self.frame_dts[0]).total_seconds()
+            fr = len(self.frame_dts) / dur if dur > 0 else 0
         else:
             fr = 0
+
+        # post-processing
+        if self.color:
+            frame = brg2rgb(frame)
+        else:
+            frame = brg2grayscale(frame)
+
+        # DEBUG
+        # gap = 1000.*(dtime - self.last_frame).total_seconds()
+        # if self.min > gap:
+        #     self.min = gap
+        # sys.stdout.write('\rframerate: {0:3.2f} ms{1:s}; min:{2:3.2f}'.format(gap, 5*' ', self.min,5*' '))
+        # sys.stdout.flush()
+        # self.last_frame = dtime
+
+        if not flag:
+            warnings.warn("Coulnd't grab frame from camera!")
+            return None
 
         # store frames for other threads
         self.mutex.lock()
@@ -116,7 +178,7 @@ class Camera(QtCore.QObject):
             self.recframes.append((frame, dtime))
             self.mutex.unlock()
             # emit signal for recording thread
-            # self.sig_new_frame.emit()
+            self.sig_new_frame.emit()
             # self.emit(QtCore.SIGNAL("NewFrame"))
 
     def new_recording(self, save_dir, file_counter, framerate=0):
@@ -131,13 +193,14 @@ class Camera(QtCore.QObject):
         if not self.recording.isOpened():
             error = 'Video-recording could not be started.'
             self.sig_raise_error.emit(error)
+            # self.emit(QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), error)
             return False
 
         self.recordingThread = QtCore.QThread()
         self.recording.moveToThread(self.recordingThread)
         self.recordingThread.start()
-        self.sig_start_rec.connect(self.recording.start_rec)
-        self.sig_start_rec.emit()
+        # self.connect(self, QtCore.SIGNAL("NewFrame"), self.recording.write)
+        self.sig_new_frame.connect(self.recording.write)
 
     def is_recording(self):
         self.mutex.lock()
@@ -151,63 +214,56 @@ class Camera(QtCore.QObject):
         self.mutex.unlock()
         return sav
 
-    def stop_capture(self):
+    def stop_recording(self):
         self.mutex.lock()
         self.continuous = False
         self.mutex.unlock()
 
     def start_capture(self):
         """ for continuous frame acquisition """
-        print('video capture started')
         self.continuous = True
         while self.is_recording():
             self.grab_frame()
 
-    # def stop_capture(self):
-    #     self.timer.stop()
+    def stop_capture(self):
+        self.mutex.lock()
+        self.continuous = False
+        self.mutex.unlock()
 
     def start_saving(self):
         self.mutex.lock()
         self.saving = True
         self.mutex.unlock()
 
+    # def stop_saving(self, triggered_frames):
     def stop_saving(self):
         self.mutex.lock()
         self.saving = False
-        # self.disconnect(self, QtCore.SIGNAL("NewFrame"), self.recording.write)
+        self.sig_new_frame.disconnect(self.recording.write)
         self.mutex.unlock()
-        
-        # last = self.recording.get_write_count()
-        # double_counter = -1
-        # while self.get_recframesize() > 0:
-        #     if self.triggered:
-        #         total = triggered_frames
-        #     else:
-        #         total = self.recording.get_write_count() + self.get_recframesize()
-        #     print('Writing: {} of {}'.format(self.get_recframesize(), total))
-        #     if last == self.recording.get_write_count(): double_counter += 1
-        #     if double_counter == 10:
-        #         error = 'Frames cannot be saved.'
-        #         self.sig_raise_error.emit(error)
-        #         # self.emit(QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), error)
-        #         break
-        #     QtCore.QThread.msleep(100)
 
-        self.recording.stop_recording()
-        # reset
-        self.recframes = deque()
+        last = self.recording.get_write_count()
+        double_counter = -1
+        #TODO: fix triggered frames properly
+        triggered_frames = 0
+        while self.get_recframesize() > 0:
+            print('Writing: {} of {}'.format(self.recording.get_write_count(), triggered_frames))
+            print(self.get_recframesize())
+            if last == self.recording.get_write_count(): double_counter += 1
+            if double_counter == 10:
+                error = 'Frames cannot be saved.'
+                self.sig_raise_error.emit(error)
+                # self.emit(QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), error)
+                break
+            QtCore.QThread.msleep(100)
 
         # wait until all frames are written, then close the recording
         # if triggered_frames == self.recording.get_write_count():
         timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
-        s = timestamp + ' \t ' + 'Frames written: '
-        if self.control.cfg['trigger'] is None:
-            s += '{}'.format(self.recording.get_write_count())
-        else:
-            # debug:
-            triggered_frames = 0
-            s += '{} of {}'.format(self.recording.get_write_count(), triggered_frames)
+        s = timestamp + ' \t ' + 'All frames written: '
+        s += '{} of {}'.format(self.recording.get_write_count(), triggered_frames)
         self.sig_set_timestamp.emit(s)
+        # self.emit(QtCore.SIGNAL('set timestamp (PyQt_PyObject)'), s)
 
         self.recording.release()
         self.recordingThread.quit()
@@ -217,5 +273,5 @@ class Camera(QtCore.QObject):
 
     def close(self):
         # release camera
+        self.capture.release()
         pass
-

@@ -1,4 +1,4 @@
-import os
+import os, sys
 from PIL import Image
 from datetime import datetime
 import numpy as np
@@ -7,7 +7,7 @@ from PIL import ImageQt as iqt
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 
@@ -91,7 +91,7 @@ class VideoCanvas(QtWidgets.QLabel):
         self.focusindex = 0
         self.focus = 1.0
         self.focuslevels = 100
-        self.focusfactors = [0.95**x for x in xrange(self.focuslevels+1)]
+        self.focusfactors = [0.95**x for x in range(self.focuslevels+1)]
 
         # mouse event filter
         self.mousefilter = self.installEventFilter(self)

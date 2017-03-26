@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
     from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
+except ImportError:
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
 
@@ -86,7 +86,7 @@ class ExperimentControl(QtCore.QObject):
         try:
             os.mkdir(self.control.output_dir)
         except:
-            print 'start new recording:', self.control.output_dir
+            print('start new recording:', self.control.output_dir)
             sys.exit('creation of output directory failed')
 
         # copy playback file to experiment directory for documentation purposes

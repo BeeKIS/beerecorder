@@ -3,14 +3,11 @@ import warnings
 from datetime import datetime
 import flycapture2 as fc2
 import numpy as np
+import cv2
 from collections import deque
 from matplotlib.dates import date2num
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError, details:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 from VideoRecording import VideoRecording
 
@@ -27,8 +24,10 @@ framerate_full = 30
 def brg2rgb(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+
 def brg2grayscale(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
 
 def get_available_flycap_cameras():
     return fc2.Context().get_num_of_cameras()

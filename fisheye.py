@@ -32,7 +32,7 @@ except ImportError as details:
 # from Base import Base
 from AudioDisplay import AudioDisplay
 from Control import Control
-from VideoCanvas import VideoTab, VideoCanvas
+from VideoCanvas import VideoTab
 
 # ######################################################
 
@@ -276,7 +276,7 @@ class Main(QtWidgets.QMainWindow):
         dlg.setWindowTitle('Comment')
         dlg.resize(500,200)
         ok = dlg.exec_()  # shows the dialog
-        s = u'{} \t {}'.format(timestamp, dlg.textValue())
+        s = '{} \t {}'.format(timestamp, dlg.textValue())
         if ok:
             self.control.set_timestamp(s)
 

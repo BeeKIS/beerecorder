@@ -8,7 +8,7 @@ from PyQt5.QtCore import pyqtSignal
 
 def get_encoder():
     if os.name == 'posix':
-        pathlist = ['/usr/bin/avconv', '/usr/bin/ffmpeg', '/usr/bin/local/ffmpeg']#, '/usr/local/Cellar/ffmpeg/3.2.2/bin/ffmpeg']
+        pathlist = ['/usr/bin/avconv', '/usr/bin/ffmpeg', '/usr/local/bin/ffmpeg']#, '/usr/local/Cellar/ffmpeg/3.2.2/bin/ffmpeg']
         for p in pathlist:
             if os.path.exists(p):
                 return p

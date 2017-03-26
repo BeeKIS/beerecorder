@@ -6,12 +6,8 @@ import sys
 import shutil
 import os
 from datetime import date, datetime, timedelta
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 
 class ExperimentControl(QtCore.QObject):

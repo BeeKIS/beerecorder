@@ -4,13 +4,8 @@ import cv2
 from datetime import datetime
 from collections import deque
 from matplotlib.dates import date2num
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
-
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from VideoRecording import VideoRecording
 
 __author__ = 'Fabian Sinz, Joerg Henninger'
@@ -42,7 +37,7 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = 30.
+        self.framerate = 25.
         self.triggered = False
         self.color = color
         self.capture = None
@@ -81,8 +76,8 @@ class Camera(QtCore.QObject):
         # try to increase the resolution of the frame capture; default is 640x480
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     def is_working(self):
         return self.capture.isOpened()

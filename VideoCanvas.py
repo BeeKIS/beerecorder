@@ -3,12 +3,8 @@ from PIL import Image
 from datetime import datetime
 import numpy as np
 from PIL import ImageQt as iqt
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 
 class VideoTab(QtWidgets.QWidget):

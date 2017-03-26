@@ -6,11 +6,10 @@ import shutil
 import os
 import sys
 
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+
+from collections import OrderedDict
 
 from AudioDev import AudioDev
 from AudioDevOut import AudioDevOut
@@ -25,11 +24,12 @@ if camera_modules['pointgrey']:
 
 from ExperimentControl import ExperimentControl
 
+
 class Devices(QtCore.QObject):
     audiodev = None
     audiodevout = None
-    cameras = dict()  # container for cameras
-    camera_threads = dict()
+    cameras = OrderedDict()  # container for cameras
+    camera_threads = OrderedDict()
 
     def __init__(self, control, parent=None,
             audio_input=True, audio_output=False, video_input=False):
@@ -118,7 +118,6 @@ class Devices(QtCore.QObject):
             self.control.sig_start_recordings.connect(cam.new_recording)
             self.control.sig_stop_recordings.connect(cam.stop_saving)
             print('cam: {} connected'.format(cam_name))
-
 
         print('video input initialized')
 

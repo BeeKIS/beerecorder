@@ -414,9 +414,12 @@ class Control(QtCore.QObject):
                 self.raise_warning('Actual video framerate much smaller than defined framerate!')
 
             for cam_name, cam in self.devices.cameras.items():
+                self.file_counter = int(cam_name.split('a')[-1]) + 1
                 cam.new_recording(self.save_dir, self.file_counter, framerate)
         else:
             for cam_name, cam in self.devices.cameras.items():
+                    # cam.new_recording(self.save_dir, self.file_counter)
+                    self.file_counter = int(cam_name.split('a')[-1]) + 1
                     cam.new_recording(self.save_dir, self.file_counter)
 
     def start_other_recordings(self):

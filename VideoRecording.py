@@ -1,19 +1,10 @@
 import sys
 import os
 import numpy as np
-
-# if os.name == 'posix':
-#     import subprocess32 as sp
-# else:
-#     import subprocess as sp
 import subprocess as sp
 import pickle
-
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError:
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 
 
 def get_encoder():
@@ -141,14 +132,15 @@ class VideoRecording(QtCore.QObject):
 
 
 class VideoWriter:
-    def __init__(self, filename, fourcc='H264', fps=30, frameSize=(640, 480), quality=20, color=False, ffmpeg_path=None):
+    def __init__(self, filename, fourcc='H264', fps=30, frameSize=(640, 480), quality=20, color=False):
         
         self.filename = filename
 
         # check if target file exists; if so: delete it
         if os.path.exists(filename):
             print('file exists: deleting ...')
-            os.path.remove(filename)
+            # os.path.remove(filename)
+            os.remove(filename)
 
         self.quality = quality
         self.color = color
@@ -185,7 +177,7 @@ class VideoWriter:
             cmd += ['-qscale:v', str(self.quality)]
         
         cmd += [self.filename]
-        self.proc = sp.Popen(cmd, stdin=sp.PIPE)
+        self.proc = sp.Popen(cmd, stdin=sp.PIPE, bufsize=10**8)
 
     def isOpened(self):
         return (self.proc != None)

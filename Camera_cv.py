@@ -77,6 +77,7 @@ class Camera(QtCore.QObject):
         # TODO: fix arbitrary camera sizes
         # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        self.capture.set(cv2.CAP_PROP_FPS, 20)
 
     def is_working(self):
         return self.capture.isOpened()
@@ -87,7 +88,7 @@ class Camera(QtCore.QObject):
         :rtype: dict
         """
         if self.capture is not None:
-            properties = [e for e in dir(cv2) if "CV_CAP_PROP" in e]
+            properties = [e for e in dir(cv2) if "CAP_PROP" in e]
             ret = {}
             for e in properties:
                 ret[e[12:].lower()] = self.capture.get(getattr(cv2, e))

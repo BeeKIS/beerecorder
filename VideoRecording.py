@@ -189,7 +189,8 @@ class VideoWriter:
         #     if image.shape[1] != self.height or image.shape[0] != self.width:
         #         print image.shape, self.height, self.width
         #         raise ValueError('Image dimensions do not match')
-        self.proc.stdin.write(image.astype(np.uint8).tostring())
+        # self.proc.stdin.write(image.astype(np.uint8).tostring())
+        self.proc.stdin.write(image.tostring())
         self.proc.stdin.flush()
 
     def release(self):

@@ -32,7 +32,7 @@ class VideoRecording(QtCore.QObject):
     sig_raise_error = pyqtSignal(object)
     mutex = QtCore.QMutex()
 
-    def __init__(self, camera, save_dir, file_counter, resolution, fps, 
+    def __init__(self, camera, save_dir, cn, file_counter, resolution, fps,
                  color=False, parent=None):
         QtCore.QObject.__init__(self, parent)
 
@@ -40,9 +40,9 @@ class VideoRecording(QtCore.QObject):
         self.camera = camera
         self.save_dir = save_dir
         self.filename = camera.filename
-        current_fn = '{:04d}__'.format(file_counter) + self.filename + '.avi'
+        current_fn = '{:04d}__'.format(file_counter) + cn + '__' + self.filename + '.avi'
         out_path = os.path.join(self.save_dir, current_fn)
-        metadata_fn = '{:04d}__'.format(file_counter) + self.filename + '_timestamps.dat'
+        metadata_fn = '{:04d}__'.format(file_counter) + '__' + self.filename + '_timestamps.dat'
         self.metadata_fn = os.path.join(self.save_dir, metadata_fn)
 
         self.write_counter = 0

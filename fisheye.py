@@ -76,6 +76,7 @@ class Main(QtWidgets.QMainWindow):
 
         # #################
         self.control.start_capture()
+        self.control.handle_options()
 
     def init_layout(self):
         # main
@@ -316,10 +317,10 @@ class Main(QtWidgets.QMainWindow):
         # print('update canvas '+str(QtCore.QThread.currentThread()))
         # check for programmed stop-time
         if self.control.programmed_stop_dt is not None \
-           and self.programmed_stop_dt < datetime.now():
-            self.stop_all_recordings()
+           and self.control.programmed_stop_dt < datetime.now():
+            self.clicked_stop()
             # wait for recordings to stop
-            self.wait(100)
+            QtCore.QThread.msleep(100)
             self.app.exit()
 
         # grab data from camera and display

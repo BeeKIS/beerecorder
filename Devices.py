@@ -23,6 +23,7 @@ class Devices(QtCore.QObject):
     audiodev = None
     audiodevout = None
     cameras = OrderedDict()  # container for cameras
+    cam_properties = OrderedDict()
     camera_threads = OrderedDict()
 
     def __init__(self, control, parent=None,
@@ -89,12 +90,10 @@ class Devices(QtCore.QObject):
         else:
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
-            camera_device_search_range = range(0, 20)
+            camera_device_search_range = range(0, 3)
             camera_name_format = 'cv_camera%02i'
             cams = [CvCamera(self.control, device_no=i) for i in camera_device_search_range]
             tmp = [cam for cam in cams if cam.is_working()]
-            # tmp = [cam for cam in [CvCamera(self.control, device_no=i) for i in camera_device_search_range] if cam.is_working()]
-
             # put cameras into dictionary
             for j, cam in enumerate(tmp):
                 cam.name = camera_name_format % j

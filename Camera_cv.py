@@ -7,6 +7,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
 from VideoRecording import VideoRecording
 
+
 __author__ = 'Fabian Sinz, Joerg Henninger'
 
 
@@ -175,12 +176,12 @@ class Camera(QtCore.QObject):
             # emit signal for recording thread
             self.sig_new_frame.emit()
 
-    def new_recording(self, save_dir, file_counter, framerate=0):
+    def new_recording(self, save_dir, cam_name, file_counter, framerate=0):
 
         if not self.triggered:
             framerate = self.framerate
 
-        self.recording = VideoRecording(self, save_dir, file_counter,
+        self.recording = VideoRecording(self, save_dir, cam_name, file_counter,
                                         self.get_resolution(),
                                         framerate)
 

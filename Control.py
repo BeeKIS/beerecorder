@@ -1,8 +1,7 @@
 """
 a class for connecting gui, hardware and experiments
 """
-import sys
-import os
+import sys, os, argparse
 from datetime import datetime, timedelta
 from optparse import OptionParser
 import numpy as np
@@ -11,6 +10,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from Devices import Devices
 from ExperimentControl import ExperimentControl
+from doc import doc, details
 
 cfg = dict(audio_input=False,
            audio_output=False,
@@ -21,12 +21,12 @@ cfg = dict(audio_input=False,
            use_hydro=False,
            # use_hydro=True,
            audio_output_chunksize=2048,
-           pointgrey = False,
+           pointgrey=False,
            fast_and_small_video=True,
            trigger=None,
            delay=0,
            scheduled_restarts=True,
-           scheduled_restarts_interval=60,
+           scheduled_restarts_interval=2,
            idle_screen=True)
 
 
@@ -96,54 +96,58 @@ class Control(QtCore.QObject):
         self.recording_restart_time = 0
         self.restart_times = np.concatenate((np.arange(self.cfg['scheduled_restarts_interval'], 24*60., self.cfg['scheduled_restarts_interval']), [24*60.]))  # in hours
         self.restart_dts = list()
+        self.programmed_stop = False
         self.programmed_stop_dt = None
         self.starttime = None
+        self.file_Name = None
 
     def handle_options(self):
-        parser = OptionParser()
-        parser.add_option("-a", "--audio", action="store_true", dest="do_not_use_audio", default=False)
-        parser.add_option("-v", "--video", action="store_true", dest="do_not_use_video", default=False)
-        parser.add_option("-o", "--output_directory", action="store", type="string", dest="output_dir", default='')
-        parser.add_option("-p", "--audio_playback", action="store", type="string", dest="audio_playback", default='')
-        parser.add_option("-l", "--audio_playback_list", action="store", type="string", dest="audio_playback_list", default='')
-        parser.add_option("-d", "--devices", action="store_true", dest="show_devices", default=False)
+        # parser = OptionParser()
+        parser = argparse.ArgumentParser(description=doc, epilog=details,
+                                         formatter_class=argparse.RawTextHelpFormatter)
+        parser.add_argument("--audio", "-a", action="store_true", dest="do_not_use_audio", default=False)
+        parser.add_argument("--video", "-v", action="store_true", dest="do_not_use_video", default=False)
+        parser.add_argument("--output_directory", "-o", action="store", type=str, dest="output_dir", default='')
+        parser.add_argument("--audio_playback", "-u", action="store", type=str, dest="audio_playback", default='')
+        parser.add_argument("--audio_playback_list", "-l", action="store", type=str, dest="audio_playback_list", default='')
+        parser.add_argument("--devices", "-d", action="store_true", dest="show_devices", default=False)
         # parser.add_option("-c", "--audio_channels", action="store", type="int", dest="audio_channels", default=1)
-        # parser.add_option("-k", "--stop_time", action="store", type="string", dest="stop_time", default='')
+        parser.add_argument("--stop_time", "-s", action="store", type=str, dest="stop_time", default='')
         # parser.add_option("-s", "--instant_start", action="store_true", dest="instant_start", default=False)
         # parser.add_option("-i", "--idle_screen", action="store_true", dest="idle_screen", default=False)
-        self.options, args = parser.parse_args(sys.argv)
+        self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
         # self.options.audio_playback = 'test_data_midi__mod.wav'
 
         # # programmed stop-time
-        # if options.stop_time:
-        #     try:
-        #         a = datetime.strptime(options.stop_time, '%H:%M:%S')
-        #         b = datetime.now()
-        #         c = datetime(b.year, b.month, b.day, a.hour, a.minute, a.second)
-        #         if c < b:
-        #             c += timedelta(days=1)
-        #     except ValueError:
-        #         pass
-        #     else:
-        #         self.programmed_stop = True
-        #         self.programmed_stop_datetime = c
+        if self.options.stop_time:
+            try:
+                a = datetime.strptime(self.options.stop_time, '%H:%M:%S')
+                b = datetime.now()
+                c = datetime(b.year, b.month, b.day, a.hour, a.minute, a.second)
+                if c < b:
+                    c += timedelta(days=1)
+            except ValueError:
+                pass
+            else:
+                self.programmed_stop = True
+                self.programmed_stop_dt = c
 
-        #     try:
-        #         a = datetime.strptime(options.stop_time, '%Y-%m-%d %H:%M:%S')
-        #     except ValueError:
-        #         pass
-        #     else:
-        #         self.programmed_stop = True
-        #         self.programmed_stop_datetime = a
+            try:
+                a = datetime.strptime(self.options.stop_time, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                pass
+            else:
+                self.programmed_stop = True
+                self.programmed_stop_dt = a
 
-        #     if not self.programmed_stop is True:
-        #         print 'Error: allowed stop-time formats are:' \
-        #               '\n"HH:MM:SS" and "YY-mm-dd HH:MM:SS"'
-        #         quit()
-        #     else:
-        #         print 'Automated Stop activated: {0:s}'.format(str(self.programmed_stop_datetime))
+            if self.programmed_stop is not True:
+                print('Error: allowed stop-time formats are:' '\n"HH:MM:SS" and "YY-mm-dd HH:MM:SS"')
+                quit()
+
+            else:
+                print('Automated Stop activated: {0:s}'.format(str(self.programmed_stop_dt)))
 
         if self.options.do_not_use_audio:
             self.cfg['audio_input'] = False
@@ -183,7 +187,7 @@ class Control(QtCore.QObject):
 
             show_available_input_devices()
             show_available_output_devices()
-            self.close()
+            quit()
 
         if not self.cfg['video_input']:
             self.name = 'fishear'
@@ -194,7 +198,7 @@ class Control(QtCore.QObject):
             ok = self.start_new_recording_session(self.cfg['delay'], query=True)
             if not ok:
                 return
-        else: # start experiment
+        else:# start experiment
             self.sig_start_experiment.emit()
 
     def triggered_stop(self):
@@ -411,13 +415,13 @@ class Control(QtCore.QObject):
                 self.raise_warning('Actual video framerate much smaller than defined framerate!')
 
             for cam_name, cam in self.devices.cameras.items():
-                self.file_counter = int(cam_name.split('a')[-1]) + 1
-                cam.new_recording(self.save_dir, self.file_counter, framerate)
+
+                cam.new_recording(self.save_dir, cam_name, self.file_counter, framerate)
         else:
             for cam_name, cam in self.devices.cameras.items():
                     # cam.new_recording(self.save_dir, self.file_counter)
-                    self.file_counter = int(cam_name.split('a')[-1]) + 1
-                    cam.new_recording(self.save_dir, self.file_counter)
+
+                    cam.new_recording(self.save_dir, cam_name, self.file_counter)
 
     def start_other_recordings(self):
         for cam_name, cam in self.devices.cameras.items():

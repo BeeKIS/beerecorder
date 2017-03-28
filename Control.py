@@ -26,7 +26,7 @@ cfg = dict(audio_input=False,
            trigger=None,
            delay=0,
            scheduled_restarts=True,
-           scheduled_restarts_interval=2,
+           scheduled_restarts_interval=30,
            idle_screen=True)
 
 

@@ -78,7 +78,7 @@ class Camera(QtCore.QObject):
         # TODO: fix arbitrary camera sizes
         # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.capture.set(cv2.CAP_PROP_FPS, 20)
+        # self.capture.set(cv2.CAP_PROP_FPS, 25)
 
     def is_working(self):
         return self.capture.isOpened()
@@ -160,7 +160,7 @@ class Camera(QtCore.QObject):
         # self.last_frame = dtime
 
         if not flag:
-            warnings.warn("Coulnd't grab frame from camera!")
+            warnings.warn("Couldn't grab frame from camera!")
             return None
 
         # store frames for other threads

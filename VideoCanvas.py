@@ -3,6 +3,7 @@ from PIL import Image
 from datetime import datetime
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
+from itertools import compress
 
 
 class VideoTab(QtWidgets.QWidget):
@@ -40,10 +41,9 @@ class VideoTab(QtWidgets.QWidget):
         # self.connect(self.quality_checkbox, QtCore.SIGNAL('toggled()'), self.canvas.set_display_quality)
 
         # checkbox for exclusion of cameras from recording
-        self.exclude = False
         self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera', self)
         videoOptionLayout.addWidget(self.exclude_cam_checkbox, QtCore.Qt.AlignRight)
-        self.quality_checkbox.stateChanged.connect(self.exclude_cam)
+        self.exclude_cam_checkbox.stateChanged.connect(self.exclude_cam)
 
         # set framerate
         # ...
@@ -70,9 +70,13 @@ class VideoTab(QtWidgets.QWidget):
         pass
 
     def exclude_cam(self):
-        self.exclude = True
-        print('excluding')
-        pass
+
+        if self.main.control.cam_exclude[self.cam_name] == 0:
+            self.main.control.cam_exclude[self.cam_name] = 1
+            print('excluded camera: ', self.cam_name)
+        else:
+            self.main.control.cam_exclude[self.cam_name] = 0
+            print('re-included camera: ', self.cam_name)
 
 class VideoCanvas(QtWidgets.QLabel):
     """This class creates the video-canvas-widget in the mainwindow by subclassing the QLabel-Widget"""

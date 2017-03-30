@@ -1,9 +1,8 @@
 """
 a class for connecting gui, hardware and experiments
 """
-import sys, os, argparse
+import os, argparse
 from datetime import datetime, timedelta
-from optparse import OptionParser
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
@@ -74,6 +73,7 @@ class Control(QtCore.QObject):
         self.debug = debug
         self.handle_options()
         self.devices = Devices(self)
+        self.cam_exclude = {key: 0 for (key, value) in self.devices.cameras.items()} # 0: not excluded; 1 excluded
 
         if self.options.audio_playback_list:
             self.exp_control = ExperimentControl(self)
@@ -415,13 +415,18 @@ class Control(QtCore.QObject):
                 self.raise_warning('Actual video framerate much smaller than defined framerate!')
 
             for cam_name, cam in self.devices.cameras.items():
-
-                cam.new_recording(self.save_dir, cam_name, self.file_counter, framerate)
+                if self.main.control.cam_exclude[cam_name] == 0:
+                    cam.new_recording(self.save_dir, cam_name, self.file_counter, framerate)
+                # else:
+                #     self.main.VideoTab.exclude_cam_checkbox.setDisabled()
         else:
             for cam_name, cam in self.devices.cameras.items():
                     # cam.new_recording(self.save_dir, self.file_counter)
-
-                    cam.new_recording(self.save_dir, cam_name, self.file_counter)
+                    if self.main.control.cam_exclude[cam_name] == 0:
+                        cam.new_recording(self.save_dir, cam_name, self.file_counter)
+                    # TODO: disable checkbox, after recording has started
+                    # else:
+                    #     self.main.VideoTab.exclude_cam_checkbox.setDisabled()
 
     def start_other_recordings(self):
         for cam_name, cam in self.devices.cameras.items():
@@ -429,7 +434,8 @@ class Control(QtCore.QObject):
 
     def stop_other_recordings(self):
         for cam_name, cam in self.devices.cameras.items():
-            cam.stop_saving()
+            if self.main.control.cam_exclude[cam_name] == 0:
+                cam.stop_saving()
 
     def close_other_recordings(self):
         QtCore.QThread.msleep(500)

@@ -41,9 +41,9 @@ class VideoTab(QtWidgets.QWidget):
         # self.connect(self.quality_checkbox, QtCore.SIGNAL('toggled()'), self.canvas.set_display_quality)
 
         # checkbox for exclusion of cameras from recording
-        self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera', self)
-        videoOptionLayout.addWidget(self.exclude_cam_checkbox, QtCore.Qt.AlignRight)
-        self.exclude_cam_checkbox.stateChanged.connect(self.exclude_cam)
+        # self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera', self)
+        videoOptionLayout.addWidget(self.main.control.exclude_cam_checkbox, QtCore.Qt.AlignRight)
+        self.main.control.exclude_cam_checkbox.stateChanged.connect(self.exclude_cam)
 
         # set framerate
         # ...

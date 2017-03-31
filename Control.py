@@ -73,6 +73,7 @@ class Control(QtCore.QObject):
         self.debug = debug
         self.handle_options()
         self.devices = Devices(self)
+        self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera')
         self.cam_exclude = {key: 0 for (key, value) in self.devices.cameras.items()} # 0: not excluded; 1 excluded
 
         if self.options.audio_playback_list:
@@ -417,16 +418,17 @@ class Control(QtCore.QObject):
             for cam_name, cam in self.devices.cameras.items():
                 if self.main.control.cam_exclude[cam_name] == 0:
                     cam.new_recording(self.save_dir, cam_name, self.file_counter, framerate)
-                # else:
-                #     self.main.VideoTab.exclude_cam_checkbox.setDisabled()
+                else:
+                    self.exclude_cam_checkbox.setDisabled(True)
+                    print('Cam will stay excluded until app restarts')
         else:
             for cam_name, cam in self.devices.cameras.items():
                     # cam.new_recording(self.save_dir, self.file_counter)
                     if self.main.control.cam_exclude[cam_name] == 0:
                         cam.new_recording(self.save_dir, cam_name, self.file_counter)
-                    # TODO: disable checkbox, after recording has started
-                    # else:
-                    #     self.main.VideoTab.exclude_cam_checkbox.setDisabled()
+                    else:
+                        self.exclude_cam_checkbox.setDisabled(True)
+                        print('Cam will stay excluded until app restarts')
 
     def start_other_recordings(self):
         for cam_name, cam in self.devices.cameras.items():

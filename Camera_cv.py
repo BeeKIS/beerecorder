@@ -21,7 +21,7 @@ def brg2grayscale(frame):
 
 class Camera(QtCore.QObject):
     # signals
-    sig_new_frame = QtCore.pyqtSignal()
+    sig_new_frame = pyqtSignal()
     sig_start_rec = pyqtSignal()
     sig_set_timestamp = pyqtSignal(object)
     sig_raise_error = pyqtSignal(object)
@@ -36,7 +36,7 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = 25.
+        self.framerate = 30.
         self.triggered = False
         self.color = color
         self.capture = None
@@ -46,6 +46,7 @@ class Camera(QtCore.QObject):
         self.post_processor = post_processor
         if post_processor is None:
             self.post_processor = lambda *args: args
+        # self.timer = QtCore.QTimer()
 
         self.saving = False
 
@@ -54,10 +55,6 @@ class Camera(QtCore.QObject):
         self.dispframe = None
 
         self.open()
-
-        # # create timer for independent frame acquisition
-        # self.timer = QtCore.QTimer()
-        # self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.grab_frame)
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
@@ -78,14 +75,15 @@ class Camera(QtCore.QObject):
         # TODO: fix arbitrary camera sizes
         # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        # self.capture.set(cv2.CAP_PROP_FPS, 25)
+        self.capture.set(cv2.CAP_PROP_FPS, int(30))
+        # self.capture.set(5, 25)
 
     def is_working(self):
         return self.capture.isOpened()
 
     def get_properties(self):
         """
-        :returns: the properties (cv2.cv.CV_CAP_PROP_*) from the camera
+        :returns: the properties (cv2.CAP_PROP_*) from the camera
         :rtype: dict
         """
         if self.capture is not None:
@@ -104,6 +102,12 @@ class Camera(QtCore.QObject):
                    int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         else:
             raise ValueError("Camera is not opened or not functional! Capture is None")
+
+    def get_fps(self):
+        if self.capture is not None:
+            return int(self.capture.get(cv2.CAP_PROP_FPS))
+        else:
+            raise ValueError("Camera is not opened yet")
 
     def get_dispframe(self):
         self.mutex.lock()
@@ -179,12 +183,18 @@ class Camera(QtCore.QObject):
     def new_recording(self, save_dir, cam_name, file_counter, framerate=0):
 
         if not self.triggered:
-            framerate = self.framerate
+            # framerate = self.framerate
+            try:
+                framerate = self.get_dispframe()[2] ## get real frame rate to encoder
+            except:
+                framerate = self.framerate
+                print('FPS was not successfully read out and set')
 
         self.recording = VideoRecording(self, save_dir, cam_name, file_counter,
                                         self.get_resolution(),
                                         framerate)
 
+        pass
         if not self.recording.isOpened():
             error = 'Video-recording could not be started.'
             self.sig_raise_error.emit(error)

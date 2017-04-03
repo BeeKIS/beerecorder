@@ -164,7 +164,6 @@ class Main(QtWidgets.QMainWindow):
         self.button_stop.clicked.connect(self.clicked_stop)
         self.button_tag.clicked.connect(self.clicked_comment)
         self.button_idle.clicked.connect(self.clicked_idle)
-        
 
     def init_video_display(self):
         self.video_layout = QtWidgets.QHBoxLayout()
@@ -328,6 +327,7 @@ class Main(QtWidgets.QMainWindow):
 
         if not self.idle_screen:
             data = self.control.devices.cameras[cam_name].get_dispframe()  # grab current frame
+            # self.control.
             if data is None:
                 return
             frame, dtime, fr = data

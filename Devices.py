@@ -98,6 +98,7 @@ class Devices(QtCore.QObject):
             for j, cam in enumerate(tmp):
                 cam.name = camera_name_format % j
                 self.cameras[cam.name] = cam
+                self.cam_properties[cam.name] = CvCamera(self.control, device_no=j).get_fps()
 
         # create threads for cameras
         for cam_name, cam in self.cameras.items():

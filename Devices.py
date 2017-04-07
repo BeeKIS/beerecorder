@@ -39,7 +39,7 @@ class Devices(QtCore.QObject):
         if control.cfg['audio_output']:
             self.init_audio_output()
         if control.cfg['video_input']:
-            self.init_video_input()
+            self.init_video_input(control.cfg['cameras'])
 
     def init_audio_input(self):
         # Audio Input
@@ -67,7 +67,7 @@ class Devices(QtCore.QObject):
         self.audiodevout.sig_playback_finished.connect(self.control.playback_finished)
         print('audio output initialized')
 
-    def init_video_input(self):
+    def init_video_input(self, camera_device_search_range):
         # Video
         if self.control.main.debug:
                 cam = DummyCamera(self.control)
@@ -90,7 +90,7 @@ class Devices(QtCore.QObject):
         else:
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
-            camera_device_search_range = range(0, 3)
+            # camera_device_search_range = range(0, 3)
             camera_name_format = 'cv_camera%02i'
             cams = [CvCamera(self.control, device_no=i) for i in camera_device_search_range]
             tmp = [cam for cam in cams if cam.is_working()]
@@ -98,7 +98,7 @@ class Devices(QtCore.QObject):
             for j, cam in enumerate(tmp):
                 cam.name = camera_name_format % j
                 self.cameras[cam.name] = cam
-                self.cam_properties[cam.name] = CvCamera(self.control, device_no=j).get_fps()
+                self.cam_properties[cam.name] = CvCamera(self.control, device_no=j).get_properties()
 
         # create threads for cameras
         for cam_name, cam in self.cameras.items():

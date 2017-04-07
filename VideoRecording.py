@@ -53,7 +53,7 @@ class VideoRecording(QtCore.QObject):
         self.sig_raise_error.connect(camera.control.raise_error)
 
         # homebrew
-        self.writer = VideoWriter(out_path, 'XVID', int(fps), resolution, quality, color)
+        self.writer = VideoWriter(out_path, 'H264', int(fps), resolution, quality, color)
         
     def start_rec(self):
         self.saving = True
@@ -152,11 +152,22 @@ class VideoWriter:
 
     def open(self):
         # 4194304 bytes
-        cmd = [encoder_path, '-loglevel', 'error',
-               '-f', 'rawvideo', '-pix_fmt', 'gray', 
-               '-s', '{:d}x{:d}'.format(self.width, self.height),
-               '-r', '{:.10f}'.format(self.fps),
-               '-i', '-']
+
+        if self.color:
+            cmd = [encoder_path, '-loglevel', 'error',
+                   '-f', 'rawvideo',
+                   '-pix_fmt', 'rgb24',
+                   '-s', '{:d}x{:d}'.format(self.width, self.height),
+                   '-r', '{:.10f}'.format(self.fps),
+                   '-i', '-']
+        else:
+            cmd = [encoder_path, '-loglevel', 'error',
+                   '-f', 'rawvideo',
+                   '-pix_fmt', 'gray',
+                   '-s', '{:d}x{:d}'.format(self.width, self.height),
+                   '-r', '{:.10f}'.format(self.fps),
+                   '-i', '-']
+
         codecs_map = {
             'XVID': 'mpeg4',
             'DIVX': 'mpeg4',
@@ -191,6 +202,8 @@ class VideoWriter:
         #         raise ValueError('Image dimensions do not match')
         # self.proc.stdin.write(image.astype(np.uint8).tostring())
         self.proc.stdin.write(image.tostring())
+        # pipe.proc.stdin.write(image_array.tostring())
+
         self.proc.stdin.flush()
 
     def release(self):

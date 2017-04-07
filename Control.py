@@ -26,7 +26,8 @@ cfg = dict(audio_input=False,
            delay=0,
            scheduled_restarts=True,
            scheduled_restarts_interval=30,
-           idle_screen=True)
+           idle_screen=True,
+           cameras=[0, 1, 2])   # add number of cameras search range.
 
 
 class Control(QtCore.QObject):
@@ -41,7 +42,7 @@ class Control(QtCore.QObject):
     sig_info_update = pyqtSignal(object)
 
     cfg = cfg
-    name = 'fisheye'
+    name = 'BEye'
 
     mutex = QtCore.QMutex()
     threads = list()
@@ -65,6 +66,7 @@ class Control(QtCore.QObject):
 
     audio_playback = False
     audio_playback_file = ''
+    color = False
 
     def __init__(self, main, debug=0, parent=None):
         QtCore.QObject.__init__(self, parent)
@@ -114,6 +116,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--devices", "-d", action="store_true", dest="show_devices", default=False)
         # parser.add_option("-c", "--audio_channels", action="store", type="int", dest="audio_channels", default=1)
         parser.add_argument("--stop_time", "-s", action="store", type=str, dest="stop_time", default='')
+        parser.add_argument("--farbe", "-f", action="store_true", dest="color", default=False)
         # parser.add_option("-s", "--instant_start", action="store_true", dest="instant_start", default=False)
         # parser.add_option("-i", "--idle_screen", action="store_true", dest="idle_screen", default=False)
         self.options = parser.parse_args()
@@ -192,6 +195,10 @@ class Control(QtCore.QObject):
 
         if not self.cfg['video_input']:
             self.name = 'fishear'
+
+        #   record in color
+        if self.options.color:
+            self.color = True
 
     def triggered_start(self):
         # start new recording session

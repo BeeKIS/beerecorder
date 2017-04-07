@@ -195,7 +195,7 @@ class VideoCanvas(QtWidgets.QLabel):
             im.save(fn)
 
         # set zoom and display quality
-        self.frame_y, self.frame_x = frame.shape
+        self.frame_y, self.frame_x = frame.shape[0:2]
         right_x = self.frame_x -self.right_x
         bottom_y = self.frame_y-self.bottom_y
 
@@ -209,8 +209,8 @@ class VideoCanvas(QtWidgets.QLabel):
 
         if len(frame.shape) == 2:
             form = QtGui.QImage.Format_Indexed8
-        # elif:
-        #     form = Format_RGB888
+        elif len(frame.shape) != 2:
+            form = QtGui.QImage.Format_RGB888
         else:
             return
 

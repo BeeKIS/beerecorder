@@ -6,12 +6,12 @@
 # TODO: add info on resolution
 # TODO: add tool to estimate frame write speed for a chosen resolution
 
-debug = False
-
-# ######################################################
-
 import sys, os
 from datetime import datetime
+from AudioDisplay import AudioDisplay
+from Control import Control
+from VideoCanvas import VideoTab
+
 
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
@@ -20,16 +20,16 @@ except ImportError as details:
     print(details)
     sys.exit('Unfortunately, your system misses the PyQt5 packages.')
 
-# from Base import Base
-from AudioDisplay import AudioDisplay
-from Control import Control
-from VideoCanvas import VideoTab
-
 # ######################################################
 
 __author__ = 'Joerg Henninger; joerg.henninger@posteo.de'
 
 # ######################################################
+
+debug = False
+
+# ######################################################
+
 
 class Main(QtWidgets.QMainWindow):
 

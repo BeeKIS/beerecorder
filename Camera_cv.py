@@ -38,7 +38,7 @@ class Camera(QtCore.QObject):
         self.filename = 'video'
         self.framerate = 30.
         self.triggered = False
-        self.color = color
+        self.color = control.color
         self.capture = None
         self.device_no = device_no
         self.name = None
@@ -73,9 +73,9 @@ class Camera(QtCore.QObject):
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
         # TODO: fix arbitrary camera sizes
-        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.capture.set(cv2.CAP_PROP_FPS, int(30))
+        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        # self.capture.set(cv2.CAP_PROP_FPS, int(30))
         # self.capture.set(5, 25)
 
     def is_working(self):
@@ -192,7 +192,7 @@ class Camera(QtCore.QObject):
 
         self.recording = VideoRecording(self, save_dir, cam_name, file_counter,
                                         self.get_resolution(),
-                                        framerate)
+                                        framerate, color=self.color)
 
         pass
         if not self.recording.isOpened():

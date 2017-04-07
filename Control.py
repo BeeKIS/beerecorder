@@ -26,8 +26,8 @@ cfg = dict(audio_input=False,
            delay=0,
            scheduled_restarts=True,
            scheduled_restarts_interval=30,
-           idle_screen=True,
-           cameras=[0, 1, 2])   # add number of cameras search range.
+           idle_screen=True)#,
+           #selected_cameras=[0, 1, 2])   # add number of cameras search range.
 
 
 class Control(QtCore.QObject):
@@ -67,6 +67,7 @@ class Control(QtCore.QObject):
     audio_playback = False
     audio_playback_file = ''
     color = False
+    selected_cameras = None
 
     def __init__(self, main, debug=0, parent=None):
         QtCore.QObject.__init__(self, parent)
@@ -104,6 +105,7 @@ class Control(QtCore.QObject):
         self.starttime = None
         self.file_Name = None
 
+
     def handle_options(self):
         # parser = OptionParser()
         parser = argparse.ArgumentParser(description=doc, epilog=details,
@@ -117,6 +119,7 @@ class Control(QtCore.QObject):
         # parser.add_option("-c", "--audio_channels", action="store", type="int", dest="audio_channels", default=1)
         parser.add_argument("--stop_time", "-s", action="store", type=str, dest="stop_time", default='')
         parser.add_argument("--farbe", "-f", action="store_true", dest="color", default=False)
+        parser.add_argument("--selected_cameras", "-k", action="store", type=str, dest="selected_cameras", default='0')
         # parser.add_option("-s", "--instant_start", action="store_true", dest="instant_start", default=False)
         # parser.add_option("-i", "--idle_screen", action="store_true", dest="idle_screen", default=False)
         self.options = parser.parse_args()
@@ -199,6 +202,9 @@ class Control(QtCore.QObject):
         #   record in color
         if self.options.color:
             self.color = True
+
+        if self.options.selected_cameras:
+            self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
 
     def triggered_start(self):
         # start new recording session

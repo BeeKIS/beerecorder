@@ -39,7 +39,7 @@ class Devices(QtCore.QObject):
         if control.cfg['audio_output']:
             self.init_audio_output()
         if control.cfg['video_input']:
-            self.init_video_input(control.cfg['cameras'])
+            self.init_video_input(control.cfg['selected_cameras'])
 
     def init_audio_input(self):
         # Audio Input

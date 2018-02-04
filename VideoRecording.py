@@ -42,7 +42,7 @@ class VideoRecording(QtCore.QObject):
         self.filename = camera.filename
         current_fn = '{:04d}__'.format(file_counter) + cn + '__' + self.filename + '.avi'
         out_path = os.path.join(self.save_dir, current_fn)
-        metadata_fn = '{:04d}__'.format(file_counter) + '__' + self.filename + '_timestamps.dat'
+        metadata_fn = '{:04d}__'.format(file_counter) + cn + '__' + self.filename + '_timestamps.dat'
         self.metadata_fn = os.path.join(self.save_dir, metadata_fn)
 
         self.write_counter = 0

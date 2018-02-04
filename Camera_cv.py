@@ -73,10 +73,12 @@ class Camera(QtCore.QObject):
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
         # TODO: fix arbitrary camera sizes
-        self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        # self.capture.set(cv2.CAP_PROP_FPS, int(30))
-        # self.capture.set(5, 25)
+        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
+        # self.capture.set(cv2.CAP_PROP_FPS, int(40))
+        # self.capture.set(5, 60)
 
     def is_working(self):
         return self.capture.isOpened()

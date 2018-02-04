@@ -183,7 +183,6 @@ class Main(QtWidgets.QMainWindow):
             for cam_name, cam in self.control.devices.cameras.items():
                 self.video_tabs[cam_name] = VideoTab(self, cam_name)
                 self.videos.addTab(self.video_tabs[cam_name], cam_name)
-
         else:
             self.videos.addTab(QtWidgets.QWidget(), "No camera found")
 

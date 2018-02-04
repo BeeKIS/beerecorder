@@ -19,9 +19,9 @@ class AudioDisplay(QtWidgets.QGroupBox):
 
     # displaytimer = QtCore.QTimer()
     
-    def __init__(self, main, source, name, channel_control=False, samplerate=44100, 
+    def __init__(self, main, source, name, channel_control=False, samplerate=48000,
         playback=True, parent=None):
-        QtWidgets.QGroupBox.__init__(self, name, parent=None)
+        QtWidgets.QGroupBox.__init__(self, name)#, parent=None)
 
         # generate layout
         self.setLayout(QtWidgets.QHBoxLayout())
@@ -208,8 +208,10 @@ class Canvas(FigureCanvas):
         FigureCanvas.setMinimumSize(self, 400, 150)
         FigureCanvas.updateGeometry(self)
 
+
 class DataGrabber(QtCore.QObject):
     datatimer = QtCore.QTimer()
+
     def __init__(self, display, parent=None):
         QtCore.QObject.__init__(self, parent)
         self.display = display
@@ -229,6 +231,7 @@ class DataGrabber(QtCore.QObject):
 
 # HELPERS
 from matplotlib import lines as mpllines
+
 
 def adjust_spines(ax, spines, dropped=False):
     for loc, spine in ax.spines.items():

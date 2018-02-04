@@ -9,7 +9,7 @@ from itertools import compress
 class VideoTab(QtWidgets.QWidget):
     """This class creates the a Tab for Camera data"""
     def __init__(self, main, cam_name, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        QtWidgets.QWidget.__init__(self, parent=parent)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.cam_name = cam_name
@@ -77,6 +77,7 @@ class VideoTab(QtWidgets.QWidget):
         else:
             self.main.control.cam_exclude[self.cam_name] = 0
             print('re-included camera: ', self.cam_name)
+
 
 class VideoCanvas(QtWidgets.QLabel):
     """This class creates the video-canvas-widget in the mainwindow by subclassing the QLabel-Widget"""

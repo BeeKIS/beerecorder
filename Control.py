@@ -11,7 +11,7 @@ from Devices import Devices
 from ExperimentControl import ExperimentControl
 from doc import doc, details
 
-cfg = dict(audio_input=False,
+cfg = dict(audio_input=True,
            audio_output=False,
            video_input=True,
            audio_input_channels=2,
@@ -26,8 +26,8 @@ cfg = dict(audio_input=False,
            delay=0,
            scheduled_restarts=True,
            scheduled_restarts_interval=30,
-           idle_screen=True)#,
-           #selected_cameras=[0, 1, 2])   # add number of cameras search range.
+           idle_screen=True,
+           selected_cameras=[0, 1, 2])   # add number of cameras search range.
 
 
 class Control(QtCore.QObject):
@@ -42,7 +42,7 @@ class Control(QtCore.QObject):
     sig_info_update = pyqtSignal(object)
 
     cfg = cfg
-    name = 'BEye'
+    name = 'bEye'
 
     mutex = QtCore.QMutex()
     threads = list()
@@ -105,7 +105,6 @@ class Control(QtCore.QObject):
         self.starttime = None
         self.file_Name = None
 
-
     def handle_options(self):
         # parser = OptionParser()
         parser = argparse.ArgumentParser(description=doc, epilog=details,
@@ -116,12 +115,12 @@ class Control(QtCore.QObject):
         parser.add_argument("--audio_playback", "-u", action="store", type=str, dest="audio_playback", default='')
         parser.add_argument("--audio_playback_list", "-l", action="store", type=str, dest="audio_playback_list", default='')
         parser.add_argument("--devices", "-d", action="store_true", dest="show_devices", default=False)
-        # parser.add_option("-c", "--audio_channels", action="store", type="int", dest="audio_channels", default=1)
+        parser.add_argument("--audio_channels", "-c", action="store", type=int, dest="audio_channels", default=1)
         parser.add_argument("--stop_time", "-s", action="store", type=str, dest="stop_time", default='')
         parser.add_argument("--farbe", "-f", action="store_true", dest="color", default=False)
         parser.add_argument("--selected_cameras", "-k", action="store", type=str, dest="selected_cameras", default='0')
-        # parser.add_option("-s", "--instant_start", action="store_true", dest="instant_start", default=False)
-        # parser.add_option("-i", "--idle_screen", action="store_true", dest="idle_screen", default=False)
+        # parser.add_argument("--instant_start", "-s", action="store_true", dest="instant_start", default=False)
+        parser.add_argument("--idle_screen", "-i", action="store_true", dest="idle_screen", default=False)
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -204,7 +203,8 @@ class Control(QtCore.QObject):
             self.color = True
 
         if self.options.selected_cameras:
-            self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
+            # self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
+            self.cfg["selected_cameras"] = [0, 1, 2]
 
     def triggered_start(self):
         # start new recording session
@@ -334,7 +334,7 @@ class Control(QtCore.QObject):
     def write_recording_info(self):
         recording_info_fn = 'recording_info.txt'
         fn = os.path.join(self.save_dir, recording_info_fn)
-        with open(fn, 'w') as f:
+        with open(fn, 'w', encoding='utf-8') as f:
             f.write('recording info: {0}\n'.format(self.rec_info['rec_info']))#.encode("utf-8"))
             f.write('starttime: {0}\n'.format(self.rec_info['rec_start']))#.encode("utf-8"))
             f.write('endtime: {0}\n'.format(self.rec_info['rec_end']))#.encode("utf-8"))

@@ -10,7 +10,7 @@ class VideoTab(QtWidgets.QWidget):
     """This class creates the a Tab for Camera data"""
     def __init__(self, main, cam_name, parent=None):
         QtWidgets.QWidget.__init__(self, parent=parent)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        #self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.cam_name = cam_name
         self.main = main

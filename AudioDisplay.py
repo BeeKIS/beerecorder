@@ -193,7 +193,6 @@ class AudioDisplay(QtWidgets.QGroupBox):
             self.ymax *= 2.
         self.ax.set_ylim(-self.ymax, self.ymax)
 
-
     def set_idle_screen(self, val):
         self.idle_screen = val
 
@@ -202,9 +201,9 @@ class Canvas(FigureCanvas):
     """This is a QWidget (as well as a FigureCanvasAgg, etc.)."""
     def __init__(self, fig, parent=None):
         FigureCanvas.__init__(self, fig)
-        FigureCanvas.setSizePolicy(self,
-            QtWidgets.QSizePolicy.Expanding,
-            QtWidgets.QSizePolicy.Expanding)
+        # FigureCanvas.setSizePolicy(self,
+        #     QtWidgets.QSizePolicy.Expanding,
+        #     QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.setMinimumSize(self, 400, 150)
         FigureCanvas.updateGeometry(self)
 
@@ -276,6 +275,7 @@ def ticks_outward(ax, tickshift = -0.015, two_y_scales=False, pad=8):
         line.set_marker(mpllines.TICKDOWN)
     for line in ax.yaxis.get_minorticklines():
         line.set_marker(mpllines.TICKLEFT)
+
 
 def box_off(ax, two_y_scales=False):
     for loc, spine in ax.spines.items():

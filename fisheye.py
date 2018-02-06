@@ -343,7 +343,7 @@ class Main(QtWidgets.QMainWindow):
 # ######################################################
 # ######################################################
 
-if __name__=="__main__":
+if __name__== "__main__":
     qapp = QtWidgets.QApplication(sys.argv)  # create the main application
     main = Main(qapp)  # create the mainwindow instance
     main.show()  # show the mainwindow instance

@@ -27,7 +27,8 @@ cfg = dict(audio_input=True,
            scheduled_restarts=True,
            scheduled_restarts_interval=30,
            idle_screen=True,
-           selected_cameras=[0, 1, 2])   # add number of cameras search range.
+           selected_cameras=[0, 1, 2], # add number of cameras search range.
+           remote=False)
 
 
 class Control(QtCore.QObject):
@@ -121,6 +122,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--selected_cameras", "-k", action="store", type=str, dest="selected_cameras", default='0')
         # parser.add_argument("--instant_start", "-s", action="store_true", dest="instant_start", default=False)
         parser.add_argument("--idle_screen", "-i", action="store_true", dest="idle_screen", default=False)
+        parser.add_argument("--remote", "-r", action="store_true", dest="remote", default=False)
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -205,6 +207,9 @@ class Control(QtCore.QObject):
         if self.options.selected_cameras:
             # self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
             self.cfg["selected_cameras"] = [0, 1, 2]
+
+        if self.options.remote:
+            self.cfg["remote"] = True
 
     def triggered_start(self):
         # start new recording session

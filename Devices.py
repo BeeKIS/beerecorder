@@ -10,6 +10,8 @@ from collections import OrderedDict
 from AudioDev import AudioDev
 from AudioDevOut import AudioDevOut
 
+from Remote import Remote
+
 from cameramodules import *
 from Camera_dummy import Camera as DummyCamera
 if camera_modules['opencv']:
@@ -40,6 +42,8 @@ class Devices(QtCore.QObject):
             self.init_audio_output()
         if control.cfg['video_input']:
             self.init_video_input(control.cfg['selected_cameras'])
+        if control.cfg['remote']:
+            self.init_remote()
 
     def init_audio_input(self):
         # Audio Input
@@ -124,5 +128,17 @@ class Devices(QtCore.QObject):
         else:
             for cam_name, cam in self.cameras.items():
                 self.sig_start_capture.connect(cam.start_capture)
+
+    def init_remote(self):
+        #   connects to specified url via ssl server/client and controls it
+        self.remote = Remote(self.control)
+        self.threadRemote = QtCore.QThread(self)
+        self.remote.moveToThread(self.threadRemote)
+        self.control.threads.append(self.threadRemote)
+        self.threadRemote.start()
+
+            # self.control.sig_remote_connect.connect(self.remote_connect.connect)
+            # print('remote connected initialized')
+
 
 

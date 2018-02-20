@@ -9,6 +9,7 @@
 import sys, os
 from datetime import datetime
 from AudioDisplay import AudioDisplay
+from Remote import RemoteDisplay
 from Control import Control
 from VideoCanvas import VideoTab
 
@@ -96,6 +97,9 @@ class Main(QtWidgets.QMainWindow):
             self.init_audio_in_display()
         if self.control.cfg['audio_output']:
             self.init_audio_out_display()
+        if self.control.cfg['remote']:
+
+            self.init_remote_display()
 
         # add control: buttons and info
         self.init_control_layout()
@@ -107,10 +111,20 @@ class Main(QtWidgets.QMainWindow):
         self.height += 200
         self.audio_layout = QtWidgets.QVBoxLayout()
         self.main_layout.addLayout(self.audio_layout)
-
         self.audio_disp = AudioDisplay(self, self.control.devices.audiodev, 'Audio Input', 
             samplerate=self.control.cfg['audio_input_samplerate'])
         self.audio_layout.addWidget(self.audio_disp)
+
+    def init_remote_display(self):
+
+        # self.height += 100
+        # self.remote_base_layout = QtWidgets.QHBoxLayout()
+        self.remote_layout = QtWidgets.QHBoxLayout()
+        # self.remote_layout = QtWidgets.QHBoxLayout(self.remote_layoutH)
+        self.main_layout.addLayout(self.remote_layout)
+        # self.remote_layout.addLayout(self.remote_layout)
+        self.remote_disp = RemoteDisplay(self, self.control.devices.remote, 'Remote Control')
+        self.remote_layout.addWidget(self.remote_disp)
 
     def init_audio_out_display(self):
         self.height += 200

@@ -11,7 +11,7 @@ from Devices import Devices
 from ExperimentControl import ExperimentControl
 from doc import doc, details
 
-cfg = dict(audio_input=True,
+cfg = dict(audio_input=False,
            audio_output=False,
            video_input=True,
            audio_input_channels=2,
@@ -41,6 +41,14 @@ class Control(QtCore.QObject):
     sig_stop_recordings = pyqtSignal()
     sig_start_experiment = pyqtSignal()
     sig_info_update = pyqtSignal(object)
+    # sig_connect_remote = pyqtSignal()
+    # sig_arm_wind = pyqtSignal()
+    # sig_start_wind = pyqtSignal()
+    # sig_stop_wind = pyqtSignal()
+    # sig_accelerate = pyqtSignal()
+    # sig_deccelerate = pyqtSignal()
+    # sig_info_remote = pyqtSignal(object)
+
 
     cfg = cfg
     name = 'bEye'

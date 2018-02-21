@@ -9,9 +9,9 @@
 import sys, os
 from datetime import datetime
 from AudioDisplay import AudioDisplay
-from Remote import RemoteDisplay
 from Control import Control
 from VideoCanvas import VideoTab
+from Remote import RemoteDisplay
 
 
 try:
@@ -98,8 +98,7 @@ class Main(QtWidgets.QMainWindow):
         if self.control.cfg['audio_output']:
             self.init_audio_out_display()
         if self.control.cfg['remote']:
-
-            self.init_remote_display()
+            self.init_remote_layout()
 
         # add control: buttons and info
         self.init_control_layout()
@@ -114,17 +113,6 @@ class Main(QtWidgets.QMainWindow):
         self.audio_disp = AudioDisplay(self, self.control.devices.audiodev, 'Audio Input', 
             samplerate=self.control.cfg['audio_input_samplerate'])
         self.audio_layout.addWidget(self.audio_disp)
-
-    def init_remote_display(self):
-
-        # self.height += 100
-        # self.remote_base_layout = QtWidgets.QHBoxLayout()
-        self.remote_layout = QtWidgets.QHBoxLayout()
-        # self.remote_layout = QtWidgets.QHBoxLayout(self.remote_layoutH)
-        self.main_layout.addLayout(self.remote_layout)
-        # self.remote_layout.addLayout(self.remote_layout)
-        self.remote_disp = RemoteDisplay(self, self.control.devices.remote, 'Remote Control')
-        self.remote_layout.addWidget(self.remote_disp)
 
     def init_audio_out_display(self):
         self.height += 200
@@ -205,6 +193,12 @@ class Main(QtWidgets.QMainWindow):
         self.canvastimer.timeout.connect(self.update_canvas)
         if len(self.control.devices.cameras):
             self.canvastimer.start(50)  # 20 Hz
+
+    def init_remote_layout(self):
+
+        self.width += 200
+        self.remote_layout = RemoteDisplay(self, self.control.devices.remote, "Wind Control")
+        self.video_layout.addWidget(self.remote_layout, alignment=Qt.AlignRight)
 
     def create_menu_bar(self):
         self.statusBar()

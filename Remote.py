@@ -4,84 +4,127 @@ import socket
 from datetime import datetime
 from collections import deque
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 
 
 class RemoteDisplay(QtWidgets.QGroupBox):
     mutex = QtCore.QMutex()
-    sig_start_connection = pyqtSignal()
-    sig_stop_connection = pyqtSignal()
+    sig_start_capture = pyqtSignal()
+    sig_stop_capture = pyqtSignal()
     sig_set_timestamp = pyqtSignal(object)
     sig_raise_error = pyqtSignal(object)
+    sig_connection_error = pyqtSignal(list)
+    sig_connection_successful = pyqtSignal(list)
+    sig_wind_speed = pyqtSignal(int)
+
+    # displaytimer = QtCore.QTimer()
 
     def __init__(self, main, source, name):
-        QtWidgets.QGroupBox.__init__(self, name)  # , parent=None)
+        QtWidgets.QGroupBox.__init__(self, name)
 
         # generate layout
-        # self.setLayout(QtWidgets.QHBoxLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
         self.source = source
 
         # ##############################
 
         self.name = name
         self.main = main
-        self.source.display = self
-        self.debug = self.main.debug
-        # self.idle_screen = False
-        # self.disp_samplerate = 200
 
         self.sig_set_timestamp.connect(main.control.set_timestamp)
         self.sig_raise_error.connect(main.control.raise_error)
-        # optionLayout = QtWidgets.QHBoxLayout()
-        # self.layout().addLayout(optionLayout)
+        self.sig_connection_error.connect(self.connection_error)
+        self.sig_connection_successful.connect(self.connection_ok)
+        self.sig_wind_speed.connect(self.show_wind_speed)
+
+        #   information board
+        self.connection_status = QtWidgets.QLabel()
+        self.connection_status.setText("Not connected")
+        self.wind_speed = QtWidgets.QLabel()
+        self.wind_speed.setText("Wind speed: 0 m/s")
 
         # remote buttons
-        self.button_arm = QtWidgets.QPushButton('Arm')
-        self.button_start = QtWidgets.QPushButton('Start')
-        self.button_stop = QtWidgets.QPushButton('Stop')
+        self.button_connect = QtWidgets.QPushButton('Connect')
+        self.button_arm_wind = QtWidgets.QPushButton('Arm')
+        self.button_start_wind = QtWidgets.QPushButton('Start')
+        self.button_stop_wind = QtWidgets.QPushButton('Stop')
         self.button_accelerate = QtWidgets.QPushButton('-')
         self.button_deccelerate = QtWidgets.QPushButton('+')
 
-        # self.main.remote_base_layout.addStretch(5)
+        self.button_connect.setMaximumHeight(50)
+        self.button_connect.setMinimumWidth(100)
+        self.button_arm_wind.setMaximumHeight(50)
+        self.button_arm_wind.setMinimumWidth(100)
+        self.button_start_wind.setMaximumHeight(50)
+        self.button_start_wind.setMinimumWidth(100)
+        self.button_stop_wind.setMaximumHeight(50)
+        self.button_stop_wind.setMinimumWidth(100)
+        self.button_accelerate.setMaximumHeight(50)
+        self.button_accelerate.setMinimumWidth(100)
+        self.button_deccelerate.setMaximumHeight(50)
+        self.button_deccelerate.setMinimumWidth(100)
+
+        self.button_arm_wind.setDisabled(True)
+        self.button_start_wind.setDisabled(True)
+        self.button_stop_wind.setDisabled(True)
+        self.button_accelerate.setDisabled(True)
+        self.button_deccelerate.setDisabled(True)
+
+        self.layout().addWidget(self.connection_status, alignment=Qt.AlignLeft)
+        self.layout().addWidget(self.wind_speed, alignment=Qt.AlignLeft)
+        self.layout().addWidget(self.button_connect, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_arm_wind, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_start_wind, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_stop_wind, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_accelerate, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_deccelerate, alignment=Qt.AlignHCenter)
+
+        # connect buttons
+        self.button_connect.clicked.connect(self.clicked_connect)
+        self.button_arm_wind.clicked.connect(self.clicked_arm_wind)
+        self.button_stop_wind.clicked.connect(self.clicked_stop_wind)
+        self.button_start_wind.clicked.connect(self.clicked_start_wind)
+        self.button_accelerate.clicked.connect(self.clicked_accelerate)
+        self.button_deccelerate.clicked.connect(self.clicked_deccelerate)
+
+
+        # self.threadDisp = QtCore.QThread()
+        # self.datagrabber.moveToThread(self.threadDisp)
+        # self.main.control.threads.append(self.threadDisp)
+        # self.threadDisp.start()
         #
-        self.main.main_layout.addWidget(self.button_arm)
-        self.main.main_layout.addWidget(self.button_start)
-        self.main.main_layout.addWidget(self.button_stop)
-        self.main.main_layout.addWidget(self.button_accelerate)
-        self.main.main_layout.addWidget(self.button_deccelerate)
-        #
-        # self.main.remote_base_layout.addWidget(self.button_arm)
-        # self.main.remote_base_layout.addWidget(self.button_start)
-        # self.main.remote_base_layout.addWidget(self.button_stop)
-        # self.main.remote_base_layout.addWidget(self.button_accelerate)
-        # self.main.remote_base_layout.addWidget(self.button_deccelerate)
+        # # connections
+        # self.main.sig_idle_screen.connect(self.set_idle_screen)
+        # self.button_audio_plus.clicked.connect(self.audio_plus)
+        # self.button_audio_minus.clicked.connect(self.audio_minus)
+        # QtCore.QTimer().singleShot(0, self.beautify)
 
-        # optionLayout.addWidget(self.button_arm)
-        # optionLayout.addWidget(self.button_accelerate)
-        # optionLayout.addWidget(self.button_deccelerate)
-        # optionLayout.addWidget(self.button_stop)
-        # optionLayout.addWidget(self.button_start)
+    def clicked_connect(self):
+        self.source.connect_remote()
 
-        xy = 50
-        self.button_arm.setMinimumHeight(xy)
-        # self.button_arm.setMaximumWidth(xy)
-        self.button_start.setMinimumHeight(xy)
-        # self.button_start.setMaximumWidth(xy)
-        self.button_stop.setMinimumHeight(xy)
-        # self.button_stop.setMaximumWidth(xy)
-        self.button_accelerate.setMinimumHeight(xy)
-        # self.button_accelerate.setMaximumWidth(xy)
-        self.button_deccelerate.setMinimumHeight(xy)
-        # self.button_deccelerate.setMaximumWidth(xy)
+    def clicked_arm_wind(self):
+        self.control.arm_wind()
 
-        # ##############################
+    def clicked_stop_wind(self):
+        self.control.stop_wind()
 
-        # connections
-        # self.button_arm.clicked.connect(self.arm)
-        # self.button_start.clicked.connect(self.start)
-        # self.button_stop.clicked.connect(self.stop)
-        # self.button_accelerate.clicked.connect(self.accelerate)
-        # self.button_deccelerate.clicked.connect(self.deccelerate)
+    def clicked_start_wind(self):
+        self.control.start_wind()
+
+    def clicked_accelerate(self):
+        self.control.accelerate()
+
+    def clicked_deccelerate(self):
+        self.control.deccelerate()
+
+    def connection_error(self, eMsg):
+        self.connection_status.setText(eMsg[0])
+
+    def connection_ok(self, eMsg):
+        self.connection_status.setText("Connected to:" + eMsg[0])
+
+    def show_wind_speed(self, value):
+        self.wind_speed.setText(str(value))
 
 
 class Remote(QtCore.QObject):
@@ -90,6 +133,7 @@ class Remote(QtCore.QObject):
     sig_raise_error = pyqtSignal(object)
     sig_exchange_finished = pyqtSignal()
     sig_new_data = pyqtSignal()
+
 
     mutex = QtCore.QMutex()
     dispdatachunks = deque()
@@ -104,87 +148,47 @@ class Remote(QtCore.QObject):
 
         """
         QtCore.QObject.__init__(self, parent)
-        self.playing = False
         self.main = main
         self.debug = debug
-        self.remotecontroler = RemoteControler()
 
         # timestamps
         self.sig_set_timestamp.connect(main.set_timestamp)
         self.sig_raise_error.connect(main.raise_error)
-        # self.sig_remote_connect()
-        # self.connect(self, QtCore.SIGNAL('set timestamp (PyQt_PyObject)'), main.set_timestamp)
-        # self.connect(self, QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), main.raise_error)
 
-    def start_server(self):
-        self.remotecontroler.start_server()
-
-
-class RemoteControler(QtCore.QObject):
-    """ very basic wav-file reader """
-
-    # server.py
-
-    def do_some_stuffs_with_input(input_string):
-        """
-        This is where all the processing happens.
-
-        Let's just read the string backwards
-        """
-
-        print("Processing that nasty input!")
-        return input_string[::-1]
-
-    def input_process(self, conn, ip, port, MAX_BUFFER_SIZE=4096):
-
-        # the input is in bytes, so decode it
-        input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
-
-        # MAX_BUFFER_SIZE is how big the message can be
-        # this is test if it's sufficiently big
-        import sys
-        siz = sys.getsizeof(input_from_client_bytes)
-        if siz >= MAX_BUFFER_SIZE:
-            print("The length of input is probably too long: {}".format(siz))
-
-        # decode input and strip the end of line
-        input_from_client = input_from_client_bytes.decode("utf8").rstrip()
-        res = self.do_some_stuffs_with_input(input_from_client)
-        print("Result of processing {} is: {}".format(input_from_client, res))
-
-        vysl = res.encode("utf8")  # encode the result string
-        conn.sendall(vysl)  # send it to client
-        conn.close()  # close connection
-        print('Connection ' + ip + ':' + port + " ended")
-
-    def start_server(self, ip="127.0.0.1"):
-
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # this is for easy starting/killing the app
-        soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        print('Socket created')
+    def connect_remote(self, to_ip="127.0.0.1", to_port=12345):
 
         try:
-            soc.bind((ip, 12345))
-            print('Socket bind complete')
-        except socket.error as msg:
-            import sys
-            print('Bind failed. Error : ' + msg.strerror + str(sys.exc_info()))
-            sys.exit()
+            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.soc.connect((to_ip, to_port))
+            self.soc.send(bytes('blabla', encoding='utf-8'))
+            self.main.main.remote_layout.sig_connection_successful.emit([to_ip])
+            result_bytes = self.soc.recv(4096)  # the number means how the response can be in bytes
+            result_int = int(result_bytes.decode("utf-8"))
+            self.main.main.remote_layout.sig_wind_speed.emit(result_int)
 
-        # Start listening on socket
-        soc.listen(10)
-        print('Socket now listening')
+        except ConnectionError as msg:
+            print("Connection error: {0}".format(msg))
+            self.main.main.remote_layout.sig_connection_error.emit([format(msg)])
 
-        while True:
-            conn, addr = soc.accept()
-            ip, port = str(addr[0]), addr[1]
-            print('Accepting connection from ' + ip + ':' + port)
-            try:
-                self.input_process(conn, ip, port).start()
-            except:
-                print("Terible error!")
-                import traceback
-                traceback.print_exc()
+    def disconnect_remote(self):
+        self.soc.close()
 
-        soc.close()
+        # result_bytes = soc.recv(4096)  # the number means how the response can be in bytes
+        # result_string = result_bytes.decode("utf-8")
+        #
+
+
+    # for x, y in data:
+    #     # send x and y separated by tab
+    #     data = "{}\t{}".format(x,y)
+    #     soc.sendall(data.encode("utf8"))
+    #
+    #     # wait for response from server, so we know
+    #     # that server has enough time to process the
+    #     # data. Without this it can make problems
+    #
+    #     if soc.recv(4096).decode("utf8") == "-":
+    #         pass
+    #
+    # # end connection by sending this string
+    # soc.send(b'--ENDOFDATA--')

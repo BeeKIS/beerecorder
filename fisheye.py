@@ -271,7 +271,7 @@ class Main(QtWidgets.QMainWindow):
 
     def clicked_comment(self):
         timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
-        dlg =  QtWidgets.QInputDialog(self)
+        dlg = QtWidgets.QInputDialog(self)
         dlg.setInputMode(QtWidgets.QInputDialog.TextInput)
         dlg.setLabelText('Comment on data:')                        
         dlg.setWindowTitle('Comment')
@@ -349,9 +349,10 @@ class Main(QtWidgets.QMainWindow):
         self.mutex.unlock()
 
 # ######################################################
-# ######################################################
+
 
 if __name__== "__main__":
+
     qapp = QtWidgets.QApplication(sys.argv)  # create the main application
     main = Main(qapp)  # create the mainwindow instance
     main.show()  # show the mainwindow instance

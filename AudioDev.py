@@ -289,8 +289,8 @@ class AudioWriter(QtCore.QObject):
 
         # soundfile module
         self.outstream = sf.SoundFile(out_path, 'w', 
-            samplerate=audiodev.rate, 
-            channels=audiodev.channels)
+            samplerate = audiodev.rate,
+            channels = audiodev.channels)
 
         # wave module
         # self.outstream = wave.open(out_path, 'wb')

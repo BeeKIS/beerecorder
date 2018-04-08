@@ -2,9 +2,11 @@
 list_modules() and available_modules() let you query which audio modules
 are installed and available.
 """
+from collections import OrderedDict
 
 # probe for available camera modules:
-camera_modules = dict()
+# camera_modules = dict()
+camera_modules = OrderedDict()
 
 try:
     from Camera_pointgrey import Camera

@@ -1,10 +1,10 @@
-import os
-import numpy as np
-import socket
-from datetime import datetime
+import socket, ssl
 from collections import deque
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+
+
+__author__ = 'Janez Presern'
 
 
 class RemoteDisplay(QtWidgets.QGroupBox):

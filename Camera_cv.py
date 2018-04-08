@@ -1,5 +1,7 @@
 import warnings
 import cv2
+import numpy as np
+# import PIL.Image as image
 from datetime import datetime
 from collections import deque
 from matplotlib.dates import date2num
@@ -36,7 +38,7 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = 30.
+        self.framerate = 20.
         self.triggered = False
         self.color = control.color
         self.capture = None
@@ -46,6 +48,9 @@ class Camera(QtCore.QObject):
         self.post_processor = post_processor
         if post_processor is None:
             self.post_processor = lambda *args: args
+
+        self.width = 1280
+        self.height = 720
         # self.timer = QtCore.QTimer()
 
         self.saving = False
@@ -55,9 +60,11 @@ class Camera(QtCore.QObject):
         self.dispframe = None
 
         self.open()
+        self.empty_frame = np.zeros((np.int(self.height), np.int(self.width), np.int(3)))
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
+        self
 
     def __enter__(self):
         self.open()
@@ -67,8 +74,10 @@ class Camera(QtCore.QObject):
         self.close()
 
     def open(self):
-        capture = cv2.VideoCapture(self.device_no)
-        self.capture = capture
+        # capture = cv2.VideoCapture(self.device_no)
+        # self.capture = capture
+        self.capture = cv2.VideoCapture(self.device_no)
+
         # try to increase the resolution of the frame capture; default is 640x480
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
         # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
@@ -77,8 +86,10 @@ class Camera(QtCore.QObject):
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
         # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
-        # self.capture.set(cv2.CAP_PROP_FPS, int(40))
+        self.capture.set(cv2.CAP_PROP_FPS, int(self.framerate))
         # self.capture.set(5, 60)
+        self.width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
     def is_working(self):
         return self.capture.isOpened()
@@ -152,10 +163,16 @@ class Camera(QtCore.QObject):
             fr = 0
 
         # post-processing
-        if self.color:
-            frame = brg2rgb(frame)
-        else:
-            frame = brg2grayscale(frame)
+        try:
+            if self.color:
+                frame = brg2rgb(frame)
+            else:
+                frame = brg2grayscale(frame)
+        except:
+            if self.color:
+                frame = self.empty_frame
+            else:
+                frame = self.empty_frame[:, :, 0]
 
         # DEBUG
         # gap = 1000.*(dtime - self.last_frame).total_seconds()

@@ -23,8 +23,6 @@ def get_encoder():
         else:
             sys.exit('No encoder found')
 
-encoder_path = get_encoder()
-
 
 class VideoRecording(QtCore.QObject):
     # signals
@@ -53,7 +51,7 @@ class VideoRecording(QtCore.QObject):
         self.sig_raise_error.connect(camera.control.raise_error)
 
         # homebrew
-        self.writer = VideoWriter(out_path, 'H264', int(fps), resolution, quality, color)
+        self.writer = VideoWriter(out_path, 'XVID', int(fps), resolution, quality, color)
         
     def start_rec(self):
         self.saving = True
@@ -210,5 +208,8 @@ class VideoWriter:
         QtCore.QThread.msleep(100)  # wait for pipe to finish processing
         self.proc.communicate()  # closes pipe
         self.proc = None
+
+
+encoder_path = get_encoder()
 
 

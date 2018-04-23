@@ -56,8 +56,8 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.button_arm_wind = QtWidgets.QPushButton('Arm')
         self.button_start_wind = QtWidgets.QPushButton('Start')
         self.button_stop_wind = QtWidgets.QPushButton('Stop')
-        self.button_accelerate = QtWidgets.QPushButton('-')
-        self.button_deccelerate = QtWidgets.QPushButton('+')
+        self.button_accelerate = QtWidgets.QPushButton('+')
+        self.button_deccelerate = QtWidgets.QPushButton('-')
 
         self.button_connect.setMaximumHeight(50)
         self.button_connect.setMinimumWidth(150)
@@ -114,19 +114,22 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.wind_speed.setText("Wind speed: 0 m/s")
 
     def clicked_arm_wind(self):
-        self.source.send_command("blublue")
+        self.source.send_command("arm")
 
     def clicked_stop_wind(self):
-        self.control.stop_wind()
+        self.source.send_command('stop')
+        # self.control.stop_wind()
 
     def clicked_start_wind(self):
-        self.control.start_wind()
+        self.source.send_command("start")
 
     def clicked_accelerate(self):
-        self.control.accelerate()
+        # self.control.accelerate()
+        self.source.send_command("accelerate")
 
     def clicked_deccelerate(self):
-        self.control.deccelerate()
+        # self.control.deccelerate()
+        self.source.send_command("decelerate")
 
     def connection_error(self, eMsg):
         self.connection_status.setText(eMsg[0])
@@ -167,7 +170,8 @@ class Remote(QtCore.QObject):
         # timestamps
         self.sig_set_timestamp.connect(main.set_timestamp)
         self.sig_raise_error.connect(main.raise_error)
-        self.to_ip = "127.0.0.1"
+        # self.to_ip = "127.0.0.1"
+        self.to_ip = "192.168.1.101"
         self.to_port = 12345
 
     def connect_remote(self):
@@ -182,7 +186,7 @@ class Remote(QtCore.QObject):
             self.main.main.remote_layout.sig_wind_speed.emit(result_int)
 
         except ConnectionError as msg:
-            print("Connection error: {0}".format(msg))
+            print(self.to_ip + ":" + str(self.to_port) + " Connection error: {0}".format(msg))
             self.main.main.remote_layout.sig_connection_error.emit([format(msg)])
 
     def send_command(self, command='blabla'):
@@ -190,9 +194,17 @@ class Remote(QtCore.QObject):
         try:
             self.soc.send(bytes(command, encoding='utf-8'))
             self.main.main.remote_layout.sig_connection_successful.emit([self.to_ip])
-            result_bytes = self.soc.recv(4096)  # the number means how the response can be in bytes
-            result_int = int(result_bytes.decode("utf-8"))
-            self.main.main.remote_layout.sig_wind_speed.emit(result_int)
+            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
+            # result_bytes = int(result_bytes.decode("utf-8"))
+            if result_bytes == "armed":
+                self.main.main.remote_layout.button_start_wind.setDisabled(False)
+                self.main.main.remote_layout.button_stop_wind.setDisabled(False)
+                self.main.main.remote_layout.button_disconnect.setDisabled(False)
+                self.main.main.remote_layout.button_accelerate.setDisabled(False)
+                self.main.main.remote_layout.button_deccelerate.setDisabled(False)
+                self.main.main.remote_layout.button_connect.setDisabled(True)
+            else:
+                self.main.main.remote_layout.sig_wind_speed.emit(int(result_bytes))
 
         except ConnectionError as msg:
             print("Connection error: {0}".format(msg))
@@ -204,4 +216,8 @@ class Remote(QtCore.QObject):
         self.main.main.remote_layout.button_disconnect.setDisabled(True)
         self.main.main.remote_layout.button_connect.setDisabled(False)
         self.main.main.remote_layout.button_arm_wind.setDisabled(True)
+        self.main.main.remote_layout.button_accelerate.setDisabled(True)
+        self.main.main.remote_layout.button_deccelerate.setDisabled(True)
+        self.main.main.remote_layout.button_start_wind.setDisabled(True)
+        self.main.main.remote_layout.button_stop_wind.setDisabled(True)
         self.main.main.remote_layout.sig_wind_speed.emit(0.)

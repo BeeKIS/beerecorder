@@ -12,6 +12,7 @@ from ExperimentControl import ExperimentControl
 from doc import doc, details
 
 cfg = dict(audio_input=False,
+           audio_input_index=[],
            audio_output=False,
            video_input=True,
            audio_input_channels=2,
@@ -25,9 +26,9 @@ cfg = dict(audio_input=False,
            trigger=None,
            delay=0,
            scheduled_restarts=True,
-           scheduled_restarts_interval=30,
+           scheduled_restarts_interval=15,
            idle_screen=True,
-           selected_cameras=[0, 1, 2], # add number of cameras search range.
+           selected_cameras=[0, 1], # add number of cameras search range.
            remote=False)
 
 
@@ -76,7 +77,7 @@ class Control(QtCore.QObject):
     audio_playback = False
     audio_playback_file = ''
     color = False
-    selected_cameras = None
+    selected_cameras = cfg['selected_cameras']
 
     def __init__(self, main, debug=0, parent=None):
         QtCore.QObject.__init__(self, parent)
@@ -118,7 +119,8 @@ class Control(QtCore.QObject):
         # parser = OptionParser()
         parser = argparse.ArgumentParser(description=doc, epilog=details,
                                          formatter_class=argparse.RawTextHelpFormatter)
-        parser.add_argument("--audio", "-a", action="store_true", dest="do_not_use_audio", default=False)
+        # parser.add_argument("--audio", "-a", action="store_true", dest="audio_input", default=False)
+        parser.add_argument("--audio", "-a", action="append", type=list, dest="audio_input", default=[])
         parser.add_argument("--video", "-v", action="store_true", dest="do_not_use_video", default=False)
         parser.add_argument("--output_directory", "-o", action="store", type=str, dest="output_dir", default='')
         parser.add_argument("--audio_playback", "-u", action="store", type=str, dest="audio_playback", default='')
@@ -165,8 +167,8 @@ class Control(QtCore.QObject):
             else:
                 print('Automated Stop activated: {0:s}'.format(str(self.programmed_stop_dt)))
 
-        if self.options.do_not_use_audio:
-            self.cfg['audio_input'] = False
+        if self.options.audio_input:
+            self.cfg['audio_input'] = list(map(int, self.options.audio_input[0]))
 
         if self.options.do_not_use_video:
             self.cfg['video_input'] = False
@@ -201,12 +203,12 @@ class Control(QtCore.QObject):
             from AudioDev import show_available_input_devices
             from AudioDevOut import show_available_output_devices
 
-            show_available_input_devices()
-            show_available_output_devices()
+            _ = show_available_input_devices()
+            _ = show_available_output_devices()
             quit()
 
         if not self.cfg['video_input']:
-            self.name = 'fishear'
+            self.name = 'BEar'
 
         #   record in color
         if self.options.color:

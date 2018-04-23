@@ -38,7 +38,7 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = 20.
+        self.framerate = 30.
         self.triggered = False
         self.color = control.color
         self.capture = None
@@ -49,8 +49,8 @@ class Camera(QtCore.QObject):
         if post_processor is None:
             self.post_processor = lambda *args: args
 
-        self.width = 1280
-        self.height = 720
+        # self.width = 1280
+        # self.height = 720
         # self.timer = QtCore.QTimer()
 
         self.saving = False
@@ -90,6 +90,7 @@ class Camera(QtCore.QObject):
         # self.capture.set(5, 60)
         self.width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
 
     def is_working(self):
         return self.capture.isOpened()

@@ -15,11 +15,14 @@ def show_available_input_devices():
     info = audio.get_host_api_info_by_index(0)
     numdevices = info.get('deviceCount')
     print('\n## Input Devices ##')
+    list_input = []
     for i in range(0, numdevices):
         if audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels') > 0:
             chans = audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels')
             name = audio.get_device_info_by_host_api_device_index(0,i).get('name')
             print("Input Device id: {} - {} - channels: {}".format(i, name, chans))
+            list_input.append(i)
+    return list_input
 
 
 class AudioDev(QtCore.QObject):
@@ -49,6 +52,7 @@ class AudioDev(QtCore.QObject):
         self.filename = 'audio'
         self.audio = pyaudio.PyAudio()
         self.capture_device_name = 'Steinberg UR22'
+        self.capture_device_index = self.control.cfg['audio_input']
 
         self.saving = False
         self.recording = False
@@ -80,12 +84,23 @@ class AudioDev(QtCore.QObject):
     def get_input_device_index_by_name(self, devname):
         info = self.audio.get_host_api_info_by_index(0)
         numdevices = info.get('deviceCount')
-        for i in range (0,numdevices):
-            if self.audio.get_device_info_by_host_api_device_index(0,i).get('maxInputChannels') > 0:
+        for i in range (0, numdevices):
+            if self.audio.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels') > 0:
                 name = self.audio.get_device_info_by_host_api_device_index(0,i).get('name')
                 if self.control.debug > 0: print("Input Device id {} - {}".format(i, name))
                 if devname in name:
                     return i, True
+                else:
+                    return -1, False
+
+    def check_input_device_index(self):
+        # info = self.audio.get_host_api_info_by_index(0)
+        info = show_available_input_devices()
+
+        # available_audio_ix = self.audio.get_device_info_by_host_api_device_index().get('index')
+        if len(list(set(self.capture_device_index) & set(info))) > 0:
+            #TODO: design for acquisition of multiple devices
+            return self.capture_device_index[0], True
         else:
             return -1, False
 
@@ -102,7 +117,8 @@ class AudioDev(QtCore.QObject):
         self.recording = True
 
         # select input device
-        index, ok = self.get_input_device_index_by_name(self.capture_device_name)
+        # index, ok = self.get_input_device_index_by_name(self.capture_device_name)
+        index, ok = self.check_input_device_index()
         if ok:
             self.in_device = self.audio.get_device_info_by_index(index)
             print()
@@ -275,9 +291,9 @@ class AudioWriter(QtCore.QObject):
         self.audiodev = audiodev
         self.save_dir = save_dir
         self.filename = audiodev.filename
-        channels = audiodev.channels
-        sampwidth = audiodev.audio.get_sample_size(audiodev.fmt)
-        rate = audiodev.rate
+        self.channels = audiodev.channels
+        self.sampwidth = audiodev.audio.get_sample_size(audiodev.fmt)
+        self.rate = audiodev.rate
         # self.audio = pyaudio.PyAudio()
         self.metawrite_count = 0
 
@@ -288,9 +304,7 @@ class AudioWriter(QtCore.QObject):
         self.metadata_fn = os.path.join(self.save_dir, metadata_fn)
 
         # soundfile module
-        self.outstream = sf.SoundFile(out_path, 'w', 
-            samplerate = audiodev.rate,
-            channels = audiodev.channels)
+        self.outstream = sf.SoundFile(out_path, 'w', samplerate=self.rate, channels=self.channels)
 
         # wave module
         # self.outstream = wave.open(out_path, 'wb')

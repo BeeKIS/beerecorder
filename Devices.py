@@ -45,20 +45,6 @@ class Devices(QtCore.QObject):
         if control.cfg['remote']:
             self.init_remote()
 
-    def init_audio_input(self):
-        # Audio Input
-        self.audiodev = AudioDev(self.control)
-        self.threadAudio = QtCore.QThread(self)
-        self.audiodev.moveToThread(self.threadAudio)
-        self.control.threads.append(self.threadAudio)
-        self.threadAudio.start()
-
-        # start stop
-        self.control.sig_start_saving.connect(self.audiodev.start_saving)
-        self.control.sig_start_capture.connect(self.audiodev.start_capture)
-
-        print('audio input initialized')
-
     def init_audio_output(self):
         # Audio Output
         self.audiodevout = AudioDevOut(self.control)
@@ -95,7 +81,8 @@ class Devices(QtCore.QObject):
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
             # camera_device_search_range = range(0, 3)
-            camera_device_search_range = [0, 1, 2]
+            camera_device_search_range = self.control.selected_cameras
+            # camera_device_search_range = [0, 1, 2]
             camera_name_format = 'cv_camera%02i'
             cams = [CvCamera(self.control, device_no=i) for i in camera_device_search_range]
             tmp = [cam for cam in cams if cam.is_working()]
@@ -140,5 +127,18 @@ class Devices(QtCore.QObject):
             # self.control.sig_remote_connect.connect(self.remote_connect.connect)
             # print('remote connected initialized')
 
+    def init_audio_input(self):
+        # Audio Input
+        self.audiodev = AudioDev(self.control)
+        self.threadAudio = QtCore.QThread(self)
+        self.audiodev.moveToThread(self.threadAudio)
+        self.control.threads.append(self.threadAudio)
+        self.threadAudio.start()
+
+        # start stop
+        self.control.sig_start_saving.connect(self.audiodev.start_saving)
+        self.control.sig_start_capture.connect(self.audiodev.start_capture)
+
+        print('audio input initialized')
 
 

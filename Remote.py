@@ -2,7 +2,7 @@ import socket, ssl
 from collections import deque
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
-
+import numpy as np
 
 __author__ = 'Janez Presern'
 
@@ -15,7 +15,7 @@ class RemoteDisplay(QtWidgets.QGroupBox):
     sig_raise_error = pyqtSignal(object)
     sig_connection_error = pyqtSignal(list)
     sig_connection_successful = pyqtSignal(list)
-    sig_wind_speed = pyqtSignal(int)
+    sig_wind_speed = pyqtSignal(float)
 
     # displaytimer = QtCore.QTimer()
 
@@ -145,17 +145,17 @@ class RemoteDisplay(QtWidgets.QGroupBox):
 
 
 class Remote(QtCore.QObject):
+# class Remote(QtCore.QRunnable):
     # signals
-    sig_set_timestamp = pyqtSignal(object)
-    sig_raise_error = pyqtSignal(object)
-    sig_exchange_finished = pyqtSignal()
-    sig_new_data = pyqtSignal()
+    sig_connection_successful = pyqtSignal(bool)
+    sig_disconnect = pyqtSignal()
+    sig_received_response = pyqtSignal()
 
     dispdatachunks = deque()
     fileindex = 0
     display = None
 
-    def __init__(self, main, debug=0, parent=None):
+    def __init__(self, control, debug=0, parent=None):
         """
         Initializes connection to RPi.
 
@@ -164,60 +164,147 @@ class Remote(QtCore.QObject):
         """
         QtCore.QObject.__init__(self, parent)
         self.mutex = QtCore.QMutex()
-        self.main = main
+        self.control = control
         self.debug = debug
 
         # timestamps
-        self.sig_set_timestamp.connect(main.set_timestamp)
-        self.sig_raise_error.connect(main.raise_error)
+        # self.sig_set_timestamp.connect(self.control.set_timestamp)
+        # self.sig_raise_error.connect(self.control.raise_error)
         # self.to_ip = "127.0.0.1"
+        self.to_ip = "192.168.1.100"
         self.to_ip = "192.168.1.101"
         self.to_port = 12345
 
     def connect_remote(self):
-
+        self.mutex.lock()
         try:
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.soc.connect((self.to_ip, self.to_port))
             self.soc.send(bytes('blabla', encoding='utf-8'))
-            self.main.main.remote_layout.sig_connection_successful.emit([self.to_ip])
-            result_bytes = self.soc.recv(4096)  # the number means how the response can be in bytes
-            result_int = int(result_bytes.decode("utf-8"))
-            self.main.main.remote_layout.sig_wind_speed.emit(result_int)
+            self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
+            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
+            # result_int = int(result_bytes.decode("utf-8"))
+            self.control.main.remote_layout.sig_wind_speed.emit(np.round(float(result_bytes.lstrip('[ ').rstrip(']')), 2))
 
         except ConnectionError as msg:
             print(self.to_ip + ":" + str(self.to_port) + " Connection error: {0}".format(msg))
-            self.main.main.remote_layout.sig_connection_error.emit([format(msg)])
+            self.control.main.remote_layout.sig_connection_error.emit([format(msg)])
+        self.mutex.unlock()
 
     def send_command(self, command='blabla'):
 
+        self.mutex.lock()
         try:
             self.soc.send(bytes(command, encoding='utf-8'))
-            self.main.main.remote_layout.sig_connection_successful.emit([self.to_ip])
+            self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
             result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
             # result_bytes = int(result_bytes.decode("utf-8"))
             if result_bytes == "armed":
-                self.main.main.remote_layout.button_start_wind.setDisabled(False)
-                self.main.main.remote_layout.button_stop_wind.setDisabled(False)
-                self.main.main.remote_layout.button_disconnect.setDisabled(False)
-                self.main.main.remote_layout.button_accelerate.setDisabled(False)
-                self.main.main.remote_layout.button_deccelerate.setDisabled(False)
-                self.main.main.remote_layout.button_connect.setDisabled(True)
+                self.control.main.remote_layout.button_start_wind.setDisabled(False)
+                self.control.main.remote_layout.button_stop_wind.setDisabled(False)
+                self.control.main.remote_layout.button_disconnect.setDisabled(False)
+                self.control.main.remote_layout.button_accelerate.setDisabled(False)
+                self.control.main.remote_layout.button_deccelerate.setDisabled(False)
+                self.control.main.remote_layout.button_connect.setDisabled(True)
             else:
-                self.main.main.remote_layout.sig_wind_speed.emit(int(result_bytes))
+                self.control.main.remote_layout.sig_wind_speed.emit(np.round(float(result_bytes.lstrip('[ ').rstrip(']')), 2))
 
         except ConnectionError as msg:
             print("Connection error: {0}".format(msg))
-            self.main.main.remote_layout.sig_connection_error.emit([format(msg)])
+            self.control.main.remote_layout.sig_connection_error.emit([format(msg)])
+        self.mutex.unlock()
 
     def disconnect_remote(self):
+        self.mutex.lock()
         self.soc.send(bytes("--ENDOFDATA--", encoding='utf-8'))
         self.soc.close()
-        self.main.main.remote_layout.button_disconnect.setDisabled(True)
-        self.main.main.remote_layout.button_connect.setDisabled(False)
-        self.main.main.remote_layout.button_arm_wind.setDisabled(True)
-        self.main.main.remote_layout.button_accelerate.setDisabled(True)
-        self.main.main.remote_layout.button_deccelerate.setDisabled(True)
-        self.main.main.remote_layout.button_start_wind.setDisabled(True)
-        self.main.main.remote_layout.button_stop_wind.setDisabled(True)
-        self.main.main.remote_layout.sig_wind_speed.emit(0.)
+        self.control.main.remote_layout.button_disconnect.setDisabled(True)
+        self.control.main.remote_layout.button_connect.setDisabled(False)
+        self.control.main.remote_layout.button_arm_wind.setDisabled(True)
+        self.control.main.remote_layout.button_accelerate.setDisabled(True)
+        self.control.main.remote_layout.button_deccelerate.setDisabled(True)
+        self.control.main.remote_layout.button_start_wind.setDisabled(True)
+        self.control.main.remote_layout.button_stop_wind.setDisabled(True)
+        self.control.main.remote_layout.sig_wind_speed.emit(0.)
+        self.mutex.unlock()
+
+
+# class Remote2(QtCore.QObject):
+class Remote2(QtCore.QRunnable):
+    # signals
+
+    sig_connection_successful = pyqtSignal(bool)
+    sig_disconnect = pyqtSignal()
+    sig_received_response = pyqtSignal()
+    sig_wind_speed = pyqtSignal(float)
+
+    dispdatachunks = deque()
+    fileindex = 0
+    display = None
+
+    def __init__(self, parent=None):
+        super(Remote2, self).__init__()
+        """
+        Initializes connection to RPi.
+
+        Returns:
+
+        """
+        self.mutex = QtCore.QMutex()
+        # self.to_ip = "127.0.0.1"
+        self.to_ip = "192.168.1.101"
+        self.to_port = 12345
+
+    @pyqtSlot()
+    def connect_remote(self):
+        self.mutex.lock()
+        try:
+            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.soc.connect((self.to_ip, self.to_port))
+            self.soc.send(bytes('blabla', encoding='utf-8'))
+            self.sig_connection_successful.emit(True)
+            result_bytes = self.soc.recv(4096)  # the number means how the response can be in bytes
+            result_int = int(result_bytes.decode("utf-8"))
+            self.sig_wind_speed.emit(result_int)
+
+        except ConnectionError as msg:
+            print(self.to_ip + ":" + str(self.to_port) + " Connection error: {0}".format(msg))
+            self.sig_connection_error.emit([format(msg)])
+        self.mutex.unlock()
+
+    def send_command(self, command='blabla'):
+
+        self.mutex.lock()
+        try:
+            self.soc.send(bytes(command, encoding='utf-8'))
+            self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
+            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
+            # result_bytes = int(result_bytes.decode("utf-8"))
+            if result_bytes == "armed":
+                self.control.main.remote_layout.button_start_wind.setDisabled(False)
+                self.control.main.remote_layout.button_stop_wind.setDisabled(False)
+                self.control.main.remote_layout.button_disconnect.setDisabled(False)
+                self.control.main.remote_layout.button_accelerate.setDisabled(False)
+                self.control.main.remote_layout.button_deccelerate.setDisabled(False)
+                self.control.main.remote_layout.button_connect.setDisabled(True)
+            else:
+                self.control.main.remote_layout.sig_wind_speed.emit(int(result_bytes))
+
+        except ConnectionError as msg:
+            print("Connection error: {0}".format(msg))
+            self.control.main.remote_layout.sig_connection_error.emit([format(msg)])
+        self.mutex.unlock()
+
+    def disconnect_remote(self):
+        self.mutex.lock()
+        self.soc.send(bytes("--ENDOFDATA--", encoding='utf-8'))
+        self.soc.close()
+        self.control.main.remote_layout.button_disconnect.setDisabled(True)
+        self.control.main.remote_layout.button_connect.setDisabled(False)
+        self.control.main.remote_layout.button_arm_wind.setDisabled(True)
+        self.control.main.remote_layout.button_accelerate.setDisabled(True)
+        self.control.main.remote_layout.button_deccelerate.setDisabled(True)
+        self.control.main.remote_layout.button_start_wind.setDisabled(True)
+        self.control.main.remote_layout.button_stop_wind.setDisabled(True)
+        self.control.main.remote_layout.sig_wind_speed.emit(0.)
+        self.mutex.unlock()

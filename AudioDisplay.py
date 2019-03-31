@@ -1,13 +1,12 @@
 import sys
-import numpy as np
-import matplotlib
-# matplotlib.use('Qt4Agg')  # this prevents hickups in new matplotlib versions
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.ticker import MultipleLocator
+
 import matplotlib.pyplot as plt
+import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
+# matplotlib.use('Qt4Agg')  # this prevents hickups in new matplotlib versions
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.ticker import MultipleLocator
 
 
 class AudioDisplay(QtWidgets.QGroupBox):
@@ -71,6 +70,7 @@ class AudioDisplay(QtWidgets.QGroupBox):
         self.ax.set_ylim(-self.ymax, self.ymax)
         self.ax.set_xlim(-self.audio_diplay_time-.25, 0.1)
         self.lines, = self.ax.plot(self.audio_t[self.mask], self.audiodata[self.mask], '-', color='k')
+        # _, _, _, self.lines = self.ax.specgram(self.audiodata[self.mask], Fs=48000, NFFT=512, window=mlab.window_hanning)
 
         # ##############################
         # buttons and channel control
@@ -132,8 +132,10 @@ class AudioDisplay(QtWidgets.QGroupBox):
         ticks_outward(self.ax)
         self.ax.xaxis.set_major_locator(MultipleLocator(2))
 
-        self.lines, = self.ax.plot(self.audio_t[self.mask], self.audiodata[self.mask], '-', color='k')
-        # self.fill_lines = self.ax.fill_between(self.audio_t, self.audiodata, facecolor='k', edgecolor='k')
+        # self.lines, = self.ax.plot(self.audio_t[self.mask], self.audiodata[self.mask], '-', color='k')
+        # _, _, _, self.lines = self.ax.specgram(self.audiodata[self.mask], Fs=48000, NFFT=512,
+        #                                        window=mlab.window_hanning)
+        self.fill_lines = self.ax.fill_between(self.audio_t, self.audiodata, facecolor='k', edgecolor='k')
         
         # self.displaytimer.start(1000)
         self.start_capture()
@@ -169,6 +171,7 @@ class AudioDisplay(QtWidgets.QGroupBox):
         if self.idle_screen:
             return
         self.mutex.lock()
+        # self.lines.set_data(self.audiodata[self.mask])
         self.lines.set_data(self.audio_t[self.mask], self.audiodata[self.mask])
         self.canvas.draw()
         self.mutex.unlock()

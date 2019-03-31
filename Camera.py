@@ -1,8 +1,9 @@
+import cv2
 import sys
 import warnings
-import cv2
-from datetime import datetime
 from collections import deque
+from datetime import datetime
+
 from matplotlib.dates import date2num
 
 try:
@@ -78,7 +79,7 @@ class Camera(QtCore.QObject):
         #~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
+        self.capture.set(cv2.CAP_PROP_FPS, self.framerate)
 
     def is_working(self):
         return self.capture.isOpened()
@@ -89,10 +90,10 @@ class Camera(QtCore.QObject):
         :rtype: dict
         """
         if self.capture is not None:
-            properties = [e for e in dir(cv2.cv) if "CV_CAP_PROP" in e]
+            properties = [e for e in dir(cv2) if "CV_CAP_PROP" in e]
             ret = {}
             for e in properties:
-                ret[e[12:].lower()] = self.capture.get(getattr(cv2.cv, e))
+                ret[e[12:].lower()] = self.capture.get(getattr(cv2, e))
             return ret
         else:
             warnings.warn("Camera needs to be opened first!")
@@ -100,8 +101,8 @@ class Camera(QtCore.QObject):
 
     def get_resolution(self):
         if self.capture is not None:
-            return int(self.capture.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)), \
-                   int(self.capture.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+            return int(self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)), \
+                   int(self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         else:
             raise ValueError("Camera is not opened or not functional! Capture is None")
 

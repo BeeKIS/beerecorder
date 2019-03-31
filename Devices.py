@@ -5,15 +5,13 @@ a class for connecting gui, hardware and experiments
 import sys
 
 from PyQt5 import QtCore
-from collections import OrderedDict
 
 from AudioDev import AudioDev
 from AudioDevOut import AudioDevOut
-
-from Remote import Remote
-
-from cameramodules import *
 from Camera_dummy import Camera as DummyCamera
+from Remote import Remote
+from cameramodules import *
+
 if camera_modules['opencv']:
     from Camera_cv import Camera as CvCamera
 if camera_modules['pointgrey']:
@@ -80,8 +78,8 @@ class Devices(QtCore.QObject):
         else:
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
-            # camera_device_search_range = range(0, 3)
-            camera_device_search_range = self.control.selected_cameras
+            camera_device_search_range = range(0, 3)
+            # camera_device_search_range = self.control.selected_cameras
             # camera_device_search_range = [0, 1, 2]
             camera_name_format = 'cv_camera%02i'
             cams = [CvCamera(self.control, device_no=i) for i in camera_device_search_range]

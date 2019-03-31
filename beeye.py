@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+
 
 # TODO: config dialogs for recording devices
 # TODO: set and indicate ROI
@@ -6,13 +6,15 @@
 # TODO: add info on resolution
 # TODO: add tool to estimate frame write speed for a chosen resolution
 
-import sys, os
+import os
+import sys
 from datetime import datetime
-from AudioDisplay import AudioDisplay
-from Control import Control
-from VideoCanvas import VideoTab
-from Remote import RemoteDisplay
 
+from AudioDisplay import AudioDisplay
+from AudioDisplay2 import SpectrogramWidget
+from Control import Control
+from Remote import RemoteDisplay
+from VideoCanvas import VideoTab
 
 try:
     from PyQt5 import QtGui, QtCore, QtWidgets
@@ -23,7 +25,12 @@ except ImportError as details:
 
 # ######################################################
 
-__author__ = 'Joerg Henninger; joerg.henninger@posteo.de'
+__author__ = 'Janez Presern'
+
+"""
+Based on "Datarecorder" of Jorg Henniger and "Videorecorder" of Bendalab
+
+"""
 
 # ######################################################
 
@@ -110,8 +117,13 @@ class Main(QtWidgets.QMainWindow):
         self.height += 200
         self.audio_layout = QtWidgets.QVBoxLayout()
         self.main_layout.addLayout(self.audio_layout)
-        self.audio_disp = AudioDisplay(self, self.control.devices.audiodev, 'Audio Input', 
-            samplerate=self.control.cfg['audio_input_samplerate'])
+        # self.audio_disp = AudioDisplay(self, self.control.devices.audiodev, 'Audio Input',
+        #     samplerate=self.control.cfg['audio_input_samplerate'])
+
+        self.audio_disp = SpectrogramWidget(self, self.control.devices.audiodev, 'Audio Input', channel_control = False,
+                                            samplerate=self.control.cfg['audio_input_samplerate'],
+                                            chunks=self.control.cfg['audio_input_chunksize'])
+
         self.audio_layout.addWidget(self.audio_disp)
 
     def init_audio_out_display(self):

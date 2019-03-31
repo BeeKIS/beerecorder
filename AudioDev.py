@@ -1,13 +1,13 @@
 import os
-import pyaudio
-import numpy as np
-from ctypes import *
-from datetime import datetime
 from collections import deque
-from matplotlib.dates import date2num
+from datetime import datetime
+
+import numpy as np
+import pyaudio
 import soundfile as sf
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
+from matplotlib.dates import date2num
 
 
 def show_available_input_devices():
@@ -36,6 +36,8 @@ class AudioDev(QtCore.QObject):
     sig_start_rec = pyqtSignal()
     # sig_new_data = pyqtSignal()
     # sig_new_meta = pyqtSignal()
+    sig_audio_read = pyqtSignal(np.ndarray)
+
 
     write_counter = 0
     metadata_counter = 0
@@ -150,7 +152,7 @@ class AudioDev(QtCore.QObject):
             input=True, frames_per_buffer=self.control.cfg['audio_input_chunksize'])
 
         while self.is_capturing():
-            data = instream.read(self.control.cfg['audio_input_chunksize'])
+            data = instream.read(self.control.cfg['audio_input_chunksize'], exception_on_overflow=False)
             # convert and normalize to +- 1.0
             data = np.fromstring(data, dtype=self.fmt_dtype).reshape(-1, self.channels).astype(float)/((2.**16)/2.)
 
@@ -231,8 +233,8 @@ class AudioDev(QtCore.QObject):
         self.sig_start_rec.emit()
 
     def start_saving(self):
-        self.grabframe_counter = 0
 
+        self.grabframe_counter = 0
         self.sync_counter = 0
         self.mutex.lock()
         self.saving = True

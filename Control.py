@@ -1,8 +1,10 @@
 """
 a class for connecting gui, hardware and experiments
 """
-import os, argparse
+import argparse
+import os
 from datetime import datetime, timedelta
+
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSignal
@@ -15,9 +17,9 @@ cfg = dict(audio_input=False,
            audio_input_index=[],
            audio_output=False,
            video_input=True,
-           audio_input_channels=2,
+           audio_input_channels=1,
            audio_input_samplerate=48000,
-           audio_input_chunksize=2048,
+           audio_input_chunksize=4096,
            use_hydro=False,
            # use_hydro=True,
            audio_output_chunksize=2048,
@@ -28,7 +30,7 @@ cfg = dict(audio_input=False,
            scheduled_restarts=True,
            scheduled_restarts_interval=15,
            idle_screen=True,
-           selected_cameras=[0, 1], # add number of cameras search range.
+           selected_cameras=[1, 2], # add number of cameras search range.
            remote=False)
 
 

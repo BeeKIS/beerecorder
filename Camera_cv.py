@@ -1,14 +1,15 @@
-import warnings
 import cv2
-import numpy as np
+import warnings
+from collections import deque
 # import PIL.Image as image
 from datetime import datetime
-from collections import deque
-from matplotlib.dates import date2num
+
+import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
-from VideoRecording import VideoRecording
+from matplotlib.dates import date2num
 
+from VideoRecording import VideoRecording
 
 __author__ = 'Fabian Sinz, Joerg Henninger'
 
@@ -49,8 +50,8 @@ class Camera(QtCore.QObject):
         if post_processor is None:
             self.post_processor = lambda *args: args
 
-        # self.width = 1280
-        # self.height = 720
+        self.width = 1280
+        self.height = 720
         # self.timer = QtCore.QTimer()
 
         self.saving = False
@@ -64,7 +65,6 @@ class Camera(QtCore.QObject):
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
-        self
 
     def __enter__(self):
         self.open()
@@ -183,6 +183,8 @@ class Camera(QtCore.QObject):
         # sys.stdout.flush()
         # self.last_frame = dtime
 
+        self.write_to_frame(frame, dtime.strftime("%Y-%m-%d %H:%M:%S"), int(0.1*self.width), int(0.1*self.height))
+
         if not flag:
             warnings.warn("Couldn't grab frame from camera!")
             return None
@@ -199,6 +201,11 @@ class Camera(QtCore.QObject):
             self.mutex.unlock()
             # emit signal for recording thread
             self.sig_new_frame.emit()
+
+    def write_to_frame(self, frm, text, where_x, where_y):
+
+        cv2.putText(frm, text, (where_x, where_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        return frm
 
     def new_recording(self, save_dir, cam_name, file_counter, framerate=0):
 

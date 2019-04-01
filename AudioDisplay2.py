@@ -23,7 +23,8 @@ class SpectrogramWidget(pg.PlotWidget):
         self.t = 10     # time of time display
         self.audio_samplerate = samplerate
         self.audio_display_time = (self.t * (self.audio_samplerate/self.chunksize))  # length of window
-        self.update_rate = int(1/(self.chunksize/self.audio_samplerate)) # in herz
+        self.update_rate = int(1/(self.chunksize/self.audio_samplerate))
+        # self.update_rate = 100 # in herz
 
         """ define display size, cosmetics  """
         self.img_array = np.zeros((int(self.audio_display_time), int(self.chunksize / 2 + 1)))

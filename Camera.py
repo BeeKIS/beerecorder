@@ -60,8 +60,8 @@ class Camera(QtCore.QObject):
         # self.timer = QtCore.QTimer()
         # self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.grab_frame)
 
-        self.connect(self, QtCore.SIGNAL('set timestamp (PyQt_PyObject)'), main.set_timestamp)
-        self.connect(self, QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), main.raise_error)
+        # self.connect(self, pyqtSignal.SIGNAL('set timestamp (PyQt_PyObject)'), main.set_timestamp)
+        # self.connect(self, QtCore.SIGNAL('Raise Error (PyQt_PyObject)'), main.raise_error)
 
     def __enter__(self):
         self.open()

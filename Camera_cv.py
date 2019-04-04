@@ -184,6 +184,8 @@ class Camera(QtCore.QObject):
         # self.last_frame = dtime
 
         self.write_to_frame(frame, dtime.strftime("%Y-%m-%d %H:%M:%S"), int(0.1*self.width), int(0.1*self.height))
+        if self.control.main.remote_layout:
+            self.write_to_frame(frame, str(self.control.main.remote_layout.speed) + " m/s", int(0.85 * self.width), int(0.1 * self.height))
 
         if not flag:
             warnings.warn("Couldn't grab frame from camera!")

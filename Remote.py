@@ -44,7 +44,6 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.name = name
         self.main = main
 
-
         self.pwSettings = ""
         self.speed = 0
         self.wished_speed = 0

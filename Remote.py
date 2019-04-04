@@ -3,7 +3,7 @@ from collections import deque
 
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSignal, Qt
 
 from calibrate import FitSpeed
 
@@ -44,6 +44,8 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.name = name
         self.main = main
 
+
+        self.pwSettings = ""
         self.speed = 0
         self.wished_speed = 0
 
@@ -134,47 +136,130 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         # self.threadDisp.start()
 
     def clicked_connect(self):
-        self.source.connect_remote()
 
-    def clicked_disconnect(self, value):
+        self.pwSettings = str(self.calib.look_up_arm()) + "-" \
+                          + str(self.calib.look_up_min_pw()) + "-" \
+                          + str(self.calib.look_up_max_pw())
+        self.source.connect_remote(self.pwSettings)
+        self.connection_status.setText("Connected\n")
+        self.wind_speed.setText("Wind speed: 0 m/s")
+        self.speed = 0
+
+    def clicked_disconnect(self):
         self.source.disconnect_remote()
         self.connection_status.setText("Disconnected\n")
-        self.wind_speed.setText("Wind speed: 0 m/s")
-        self.source.send_command("arm")
-
-    def clicked_arm_wind(self):
+        self.wind_speed.setText("Wind speed: Disarmed")
         # self.source.send_command("arm")
-        print("arm")
+        self.speed = None
 
     def clicked_stop_wind(self):
-        # self.source.send_command('stop')
-        # self.control.stop_wind()
+        self.source.send_command(str(self.calib.look_up_arm()))
+        self.wind_speed.setText("Wind speed: 0 m/s")
         print("stop")
+        self.speed = 0
 
     def clicked_start_wind(self):
-        # self.source.send_command("start")
+        self.source.send_command(str(self.calib.look_up_min_pw()))
+        self.wind_speed.setText("Wind speed: 0 m/s")
         print("start")
+        self.speed = 0
 
     def clicked_accelerate_major(self):
-        # self.control.accelerate()
-        # self.source.send_command("accelerate")
-        # self.source.send_command("+0.5")
-        self.wished_speed += 0.5
-        print(self.calib.look_up_pwm(self.wished_speed))
+
+        if self.speed <= (self.calib.look_up_max_speed() - 0.5):
+
+            self.speed += 0.5
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif (self.speed <= self.calib.look_up_max_speed()) & (self.speed > self.calib.look_up_max_speed() - 0.5):
+
+            self.speed = self.calib.look_up_max_speed()
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif self.speed == self.calib.look_up_max_speed():
+            print("reached maximum speed")
+            self.speed = np.round(self.speed, 2)
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            # self.connection_status.setText("Maximum speed reached\n")
 
     def clicked_deccelerate_major(self):
-        # self.control.deccelerate()
-        self.wished_speed -= 0.5
 
-        print(self.calib.look_up_pwm(self.wished_speed))
+        if self.speed >= self.calib.look_up_min_speed() + 0.5:
 
-    def clicked_accelerate_minor(self):
-        # self.control.accelerate()
-        self.source.send_command("")
+            self.speed -= 0.5
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif (self.speed >= self.calib.look_up_min_speed()) & (self.speed < self.calib.look_up_min_speed() + 0.5):
+
+            self.speed = self.calib.look_up_min_speed()
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif self.speed == self.calib.look_up_min_speed():
+
+            print("reached minimum speed")
+            self.speed = np.round(self.speed, 2)
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
 
     def clicked_deccelerate_minor(self):
-        # self.control.deccelerate()
-        self.source.send_command("decelerate")
+        # self.control.accelerate()
+
+        if self.speed >= self.calib.look_up_min_speed() + 0.1:
+
+            self.speed -= 0.1
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif (self.speed >= self.calib.look_up_min_speed()) & (self.speed < self.calib.look_up_min_speed() + 0.1):
+
+            self.speed = self.calib.look_up_min_speed()
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif self.speed == self.calib.look_up_min_speed():
+
+            print("reached minimum speed")
+            self.speed = np.round(self.speed, 2)
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+    def clicked_accelerate_minor(self):
+
+        if self.speed <= (self.calib.look_up_max_speed() - 0.1):
+
+            self.speed += 0.1
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif (self.speed <= self.calib.look_up_max_speed()) & (self.speed > self.calib.look_up_max_speed() - 0.1):
+
+            self.speed += self.calib.look_up_min_speed()
+            self.speed = np.round(self.speed, 2)
+            print(self.calib.look_up_pw(self.speed))
+            self.source.send_command(str(self.calib.look_up_pw(self.speed)))
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+
+        elif self.speed == self.calib.look_up_max_speed():
+            print("reached maximum speed")
+            self.speed = np.round(self.speed, 2)
+            self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            # self.connection_status.setText("Maximum speed reached\n")
 
     def connection_error(self, eMsg):
         self.connection_status.setText(eMsg[0])
@@ -187,11 +272,14 @@ class RemoteDisplay(QtWidgets.QGroupBox):
 
     def show_wind_speed(self, value):
 
-        self.wind_speed.setText("Wind speed: "+ str(self.calib.look_up(value)) + " m/s")
+        if value == 0:
+            self.wind_speed.setText("Wind speed: " + str(0.0) + " m/s")
+        else:
+            self.wind_speed.setText("Wind speed: " + str(self.calib.look_up(value)) + " m/s")
 
 
 class Remote(QtCore.QObject):
-# class Remote(QtCore.QRunnable):
+
     # signals
     sig_connection_successful = pyqtSignal(bool)
     sig_disconnect = pyqtSignal()
@@ -209,14 +297,19 @@ class Remote(QtCore.QObject):
 
         """
         QtCore.QObject.__init__(self, parent)
+        # QtCore.QRunnable.__init__(self)#, parent)
         self.mutex = QtCore.QMutex()
         self.control = control
         self.debug = debug
+        self.received = None
 
         # timestamps
         # self.sig_set_timestamp.connect(self.control.set_timestamp)
         # self.sig_raise_error.connect(self.control.raise_error)
         self.to_ip = "127.0.0.1"
+        self.to_ip = "172.16.100.87"
+        self.to_ip = "192.168.1.7"  # javornik
+
         # self.to_ip = "192.168.1.100"
         # self.to_ip = "192.168.1.101"
         self.to_port = 12345
@@ -225,20 +318,16 @@ class Remote(QtCore.QObject):
                         100: [434, 481, 761],
                         400: [1736, 1954, 3047]
                         }
-        self.pwmFreq = 60
+        self.pwmFreq = 100
 
-    def connect_remote(self):
+    def connect_remote(self, pw_arm):
         self.mutex.lock()
         try:
             self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.soc.connect((self.to_ip, self.to_port))
-            self.soc.send(bytes('pwmFreq'+str(self.pwmFreq), encoding='utf-8'))
-            self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
-            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
-            # result_int = int(result_bytes.decode("utf-8"))
-            # self.control.main.remote_layout.sig_wind_speed.emit(result_bytes.lstrip('[ ').rstrip(']'))
-            # self.control.main.remote_layout.sig_connection_successful.emit(result_bytes.lstrip('[').rstrip(']'))
-            if result_bytes == 'armed':
+            self.soc.send(bytes('arm_' + pw_arm, encoding='utf-8'))
+            self.received = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
+            if self.received:
 
                 self.control.main.remote_layout.button_start_wind.setDisabled(False)
                 self.control.main.remote_layout.button_stop_wind.setDisabled(False)
@@ -261,9 +350,9 @@ class Remote(QtCore.QObject):
         try:
             self.soc.send(bytes(command, encoding='utf-8'))
             self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
-            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
+            self.received = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
             # result_bytes = int(result_bytes.decode("utf-8"))
-            if result_bytes == "armed":
+            if self.received == "armed":
                 self.control.main.remote_layout.button_start_wind.setDisabled(False)
                 self.control.main.remote_layout.button_stop_wind.setDisabled(False)
                 self.control.main.remote_layout.button_disconnect.setDisabled(False)
@@ -272,8 +361,10 @@ class Remote(QtCore.QObject):
                 self.control.main.remote_layout.button_accelerate_minor.setDisabled(False)
                 self.control.main.remote_layout.button_deccelerate_minor.setDisabled(False)
                 self.control.main.remote_layout.button_connect.setDisabled(True)
+            elif self.received == "done":
+                pass
             else:
-                self.control.main.remote_layout.sig_wind_speed.emit(np.round(float(result_bytes.lstrip('[ ').rstrip(']')), 2))
+                self.control.main.remote_layout.sig_wind_speed.emit(np.round(float(self.received.lstrip('[ ').rstrip(']')), 2))
 
         except ConnectionError as msg:
             print("Connection error: {0}".format(msg))
@@ -286,92 +377,11 @@ class Remote(QtCore.QObject):
         self.soc.close()
         self.control.main.remote_layout.button_disconnect.setDisabled(True)
         self.control.main.remote_layout.button_connect.setDisabled(False)
-        self.control.main.remote_layout.button_arm_wind.setDisabled(True)
+        # self.control.main.remote_layout.button_arm_wind.setDisabled(True)
         self.control.main.remote_layout.button_accelerate_major.setDisabled(True)
         self.control.main.remote_layout.button_deccelerate_major.setDisabled(True)
         self.control.main.remote_layout.button_accelerate_minor.setDisabled(True)
         self.control.main.remote_layout.button_deccelerate_minor.setDisabled(True)
-        self.control.main.remote_layout.button_start_wind.setDisabled(True)
-        self.control.main.remote_layout.button_stop_wind.setDisabled(True)
-        self.control.main.remote_layout.sig_wind_speed.emit(0.)
-        self.mutex.unlock()
-
-
-# class Remote2(QtCore.QObject):
-class Remote2(QtCore.QRunnable):
-    # signals
-
-    sig_connection_successful = pyqtSignal(bool)
-    sig_disconnect = pyqtSignal()
-    sig_received_response = pyqtSignal()
-    sig_wind_speed = pyqtSignal(float)
-
-    dispdatachunks = deque()
-    fileindex = 0
-    display = None
-
-    def __init__(self, parent=None):
-        super(Remote2, self).__init__()
-        """
-        Initializes connection to RPi.
-
-        Returns:
-
-        """
-        self.mutex = QtCore.QMutex()
-        # self.to_ip = "127.0.0.1"
-        self.to_ip = "192.168.1.101"
-        self.to_port = 12345
-
-    @pyqtSlot()
-    def connect_remote(self):
-        self.mutex.lock()
-        try:
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.soc.connect((self.to_ip, self.to_port))
-            self.soc.send(bytes('blabla', encoding='utf-8'))
-            self.sig_connection_successful.emit(True)
-            result_bytes = self.soc.recv(4096)  # the number means how the response can be in bytes
-            result_int = int(result_bytes.decode("utf-8"))
-            self.sig_wind_speed.emit(result_int)
-
-        except ConnectionError as msg:
-            print(self.to_ip + ":" + str(self.to_port) + " Connection error: {0}".format(msg))
-            self.sig_connection_error.emit([format(msg)])
-        self.mutex.unlock()
-
-    def send_command(self, command='blabla'):
-
-        self.mutex.lock()
-        try:
-            self.soc.send(bytes(command, encoding='utf-8'))
-            self.control.main.remote_layout.sig_connection_successful.emit([self.to_ip])
-            result_bytes = self.soc.recv(4096).decode("utf-8")  # the number means how the response can be in bytes
-            # result_bytes = int(result_bytes.decode("utf-8"))
-            if result_bytes == "armed":
-                self.control.main.remote_layout.button_start_wind.setDisabled(False)
-                self.control.main.remote_layout.button_stop_wind.setDisabled(False)
-                self.control.main.remote_layout.button_disconnect.setDisabled(False)
-                self.control.main.remote_layout.button_accelerate.setDisabled(False)
-                self.control.main.remote_layout.button_deccelerate.setDisabled(False)
-                self.control.main.remote_layout.button_connect.setDisabled(True)
-            else:
-                self.control.main.remote_layout.sig_wind_speed.emit(int(result_bytes))
-
-        except ConnectionError as msg:
-            print("Connection error: {0}".format(msg))
-            self.control.main.remote_layout.sig_connection_error.emit([format(msg)])
-        self.mutex.unlock()
-
-    def disconnect_remote(self):
-        self.mutex.lock()
-        self.soc.send(bytes("--ENDOFDATA--", encoding='utf-8'))
-        self.soc.close()
-        self.control.main.remote_layout.button_disconnect.setDisabled(True)
-        self.control.main.remote_layout.button_connect.setDisabled(False)
-        self.control.main.remote_layout.button_arm_wind.setDisabled(True)
-        self.control.main.remote_layout.button_accelerate.setDisabled(True)
-        self.control.main.remote_layout.button_deccelerate.setDisabled(True)
         self.control.main.remote_layout.button_start_wind.setDisabled(True)
         self.control.main.remote_layout.button_stop_wind.setDisabled(True)
         self.control.main.remote_layout.sig_wind_speed.emit(0.)

@@ -78,7 +78,8 @@ class Devices(QtCore.QObject):
         else:
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
-            camera_device_search_range = range(0, 3)
+            camera_device_search_range = range(1, 3)
+
             # camera_device_search_range = self.control.selected_cameras
             # camera_device_search_range = [0, 1, 2]
             camera_name_format = 'cv_camera%02i'

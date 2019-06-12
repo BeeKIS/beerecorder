@@ -1,6 +1,6 @@
 
 doc = '''
-beeRecorder 1.1
+beeRecorder 1.2
 ====================
 Program can record video with multiple cameras, both webcams or built-ins, industrial
 like PointGrey.
@@ -18,4 +18,7 @@ to be added
 "--farbe", "-f"                 record and display in color             ./beeye.py -f     records in camera
 "--selected_cameras", "-k"      activate selected cameras only.         ./beeye.py -k 012 activates cameras 0, 1 and 2
 "--remote", "-r"                activate remote connection to wind tunnel
+"--audio", "-a"                 activates audio recording via selected channel ./beeye.py -a 0 records from audio channel 0
+"--srate", "-sr"                sets sound sample rate                  ./beeye.py -sr 16000 samples at 16 kHz. Default is 48000
+"--frate", "-fps"               sets frame rate                         ./beeye.py -fps 30 Default is 20
 '''

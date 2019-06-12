@@ -13,12 +13,14 @@ from Devices import Devices
 from ExperimentControl import ExperimentControl
 from doc import doc, details
 
-cfg = dict(audio_input=False,
+cfg = dict(video_input=True,
+           video_fps = 20,
+           video_color = False,
+           audio_input=False,
            audio_input_index=[],
            audio_output=False,
-           video_input=True,
            audio_input_channels=1,
-           audio_input_samplerate=16000,
+           audio_input_samplerate=48000,
            audio_input_chunksize=512,
            use_hydro=False,
            # use_hydro=True,
@@ -127,6 +129,8 @@ class Control(QtCore.QObject):
         # parser.add_argument("--instant_start", "-s", action="store_true", dest="instant_start", default=False)
         parser.add_argument("--idle_screen", "-i", action="store_true", dest="idle_screen", default=False)
         parser.add_argument("--remote", "-r", action="store_true", dest="remote", default=False)
+        parser.add_argument("--srate", "-sr", action="store", type=int, dest="srate", default=48000)
+        parser.add_argument("--frate", "-fps", action="store", type=int, dest="frate", default=20)
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -207,6 +211,7 @@ class Control(QtCore.QObject):
         #   record in color
         if self.options.color:
             self.color = True
+            self.cfg["video_color"] = True
 
         if self.options.selected_cameras:
             # self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
@@ -214,6 +219,12 @@ class Control(QtCore.QObject):
 
         if self.options.remote:
             self.cfg["remote"] = True
+
+        if self.options.srate:
+            self.cfg["audio_input_samplerate"] = self.options.srate
+
+        if self.options.frate:
+            self.cfg["video_fps"] = self.options.frate
 
     def triggered_start(self):
         # start new recording session

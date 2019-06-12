@@ -39,9 +39,9 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = 30.
+        self.framerate = control.cfg["video_fps"]
         self.triggered = False
-        self.color = control.color
+        self.color = control.cfg["video_color"]
         self.capture = None
         self.device_no = device_no
         self.name = None

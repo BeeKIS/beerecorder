@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 
 # TODO: config dialogs for recording devices
 # TODO: set and indicate ROI
@@ -10,25 +10,27 @@ import os
 import sys
 from datetime import datetime
 
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt, pyqtSignal
+
 from AudioDisplay import AudioDisplay
 from AudioDisplay2 import SpectrogramWidget
 from Control import Control
 from Remote import RemoteDisplay
 from VideoCanvas import VideoTab
 
-try:
-    from PyQt5 import QtGui, QtCore, QtWidgets
-    from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
-except ImportError as details:
-    print(details)
-    sys.exit('Unfortunately, your system misses the PyQt5 packages.')
-
 # ######################################################
 
 __author__ = 'Janez Presern'
 
 """
-Based on "Datarecorder" of Jorg Henniger and "Videorecorder" of Bendalab
+In majority based on "Datarecorder" of Jorg Henniger and "Videorecorder" of Bendalab.
+
+The recorder is meant for parallel recording of video streams and single audio stream. It also provides possibility of 
+audio stimulation.
+
+There is also a possibility of remotely connecting to another system, for example RPi via socks.
+
 
 """
 
@@ -78,9 +80,6 @@ class Main(QtWidgets.QMainWindow):
         self.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         self.setMinimumSize(self.width, self.height)
         self.setWindowTitle(self.control.name)
-
-        # for thread in self.control.threads:
-        #     print thread
 
         # #################
         self.control.start_capture()
@@ -328,7 +327,7 @@ class Main(QtWidgets.QMainWindow):
         for thread in self.control.threads:
             thread.quit()
         QtCore.QThread.msleep(200)
-        print('See ya ...')
+        print('To bee ...')
         self.app.quit()
 
     def update_canvas(self):
@@ -365,7 +364,7 @@ class Main(QtWidgets.QMainWindow):
 
 if __name__== "__main__":
 
-    qapp = QtWidgets.QApplication(sys.argv)  # create the main application
-    main = Main(qapp)  # create the mainwindow instance
-    main.show()  # show the mainwindow instance
-    qapp.exec_()  # start the event-loop: no signals are sent or received without this.
+    qapp = QtWidgets.QApplication(sys.argv)     # create the main application
+    main = Main(qapp)                           # create the mainwindow instance
+    main.show()                                 # show the mainwindow instance
+    qapp.exec_()                                # start the event-loop: no signals are sent or received without this.

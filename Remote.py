@@ -3,7 +3,7 @@ from collections import deque
 
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal
 
 from calibrate import FitSpeed
 
@@ -11,10 +11,7 @@ __author__ = 'Janez Presern'
 
 
 #TODO: enter the time stamp when wind velocity changes. Maybe as separate log??
-#TODO: keep track of speed
-#todo: transfer speed control from tunnel to here
 #TODO: await confirmation from tunnel control
-
 
 
 class RemoteDisplay(QtWidgets.QGroupBox):
@@ -54,12 +51,6 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.sig_connection_successful.connect(self.connection_ok)
         self.sig_wind_speed.connect(self.show_wind_speed)
         # self.sig_disconnection.successful()
-
-        # # threads
-        # self.threadRemote = QtCore.QThread()
-        # self.rem_layout.moveToThread(self.threadRemote)
-        # self.main.control.threads.append(self.threadRemote)
-        # self.threadRemote.start()
 
         #   information board
         self.connection_status = QtWidgets.QLabel()
@@ -106,17 +97,17 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.button_accelerate_minor.setDisabled(True)
         self.button_deccelerate_minor.setDisabled(True)
 
-        self.layout().addWidget(self.connection_status, alignment=Qt.AlignLeft)
-        self.layout().addWidget(self.wind_speed, alignment=Qt.AlignLeft)
-        self.layout().addWidget(self.button_connect, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_disconnect, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.connection_status)
+        self.layout().addWidget(self.wind_speed)#, alignment=Qt.AlignLeft)
+        self.layout().addWidget(self.button_connect)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_disconnect)#, alignment=Qt.AlignHCenter)
         # self.layout().addWidget(self.button_arm_wind, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_start_wind, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_stop_wind, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_accelerate_major, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_accelerate_minor, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_deccelerate_minor, alignment=Qt.AlignHCenter)
-        self.layout().addWidget(self.button_deccelerate_major, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_start_wind)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_stop_wind)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_accelerate_major)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_accelerate_minor)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_deccelerate_minor)#, alignment=Qt.AlignHCenter)
+        self.layout().addWidget(self.button_deccelerate_major)#, alignment=Qt.AlignHCenter)
 
         # connect buttons
         self.button_connect.clicked.connect(self.clicked_connect)
@@ -309,7 +300,7 @@ class Remote(QtCore.QObject):
         self.to_ip = "172.16.100.87"
         self.to_ip = "192.168.1.7"  # javornik
 
-        # self.to_ip = "192.168.1.100"
+        self.to_ip = "192.168.1.100"
         # self.to_ip = "192.168.1.101"
         self.to_port = 12345
 

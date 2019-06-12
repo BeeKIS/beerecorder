@@ -16,7 +16,7 @@ class FitSpeed(QtCore.QObject):
         # self.speed_range = np.arange(min(self.calib_data.speed), max(self.calib_data.speed) + 1, 0.01)
         self.speed_range = np.round(self.spl(self.pw_range), 2)
         print("\n## Name of the wind ##")
-        print("Wild calibration lookup-table precomputed and loaded")
+        print("Wind calibration lookup-table precomputed and loaded")
 
     def look_up(self, pw):
 

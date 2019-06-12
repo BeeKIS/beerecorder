@@ -74,13 +74,9 @@ class Camera(QtCore.QObject):
         self.close()
 
     def open(self):
-        # capture = cv2.VideoCapture(self.device_no)
-        # self.capture = capture
+
         self.capture = cv2.VideoCapture(self.device_no)
 
-        # try to increase the resolution of the frame capture; default is 640x480
-        # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 864)
-        # ~ self.capture.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 480)
         # TODO: fix arbitrary camera sizes
         # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -183,9 +179,10 @@ class Camera(QtCore.QObject):
         # sys.stdout.flush()
         # self.last_frame = dtime
 
-        self.write_to_frame(frame, dtime.strftime("%Y-%m-%d %H:%M:%S"), int(0.1*self.width), int(0.1*self.height))
-        if self.control.main.remote_layout:
-            self.write_to_frame(frame, str(self.control.main.remote_layout.speed) + " m/s", int(0.85 * self.width), int(0.1 * self.height))
+        self.write_to_frame(frame, dtime.strftime("%Y-%m-%d %H:%M:%S"), int(0.05*self.width), int(0.05*self.height))
+
+        if self.control.options.remote:
+            self.write_to_frame(frame, str(self.control.main.remote_layout.speed) + " m/s", int(0.85 * self.width), int(0.05 * self.height))
 
         if not flag:
             warnings.warn("Couldn't grab frame from camera!")
@@ -206,6 +203,7 @@ class Camera(QtCore.QObject):
 
     def write_to_frame(self, frm, text, where_x, where_y):
 
+        # cv2.rectangle(frm, (0, 0), (int(self.width-1), int(self.height*0.15)), (200, 200, 200), cv2.FILLED)
         cv2.putText(frm, text, (where_x, where_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
         return frm
 

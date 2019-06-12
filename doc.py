@@ -4,6 +4,8 @@ beeRecorder 1.1
 ====================
 Program can record video with multiple cameras, both webcams or built-ins, industrial
 like PointGrey.
+
+There is also a possibility of remotely connecting to another system, for example an RPi via socks.
 '''
 details = '''
 Keyboard Shortcuts:

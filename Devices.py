@@ -34,13 +34,13 @@ class Devices(QtCore.QObject):
         self.cfg = control.cfg
 
         # init
-        if control.cfg['audio_input']:
+        if self.cfg['audio_input']:
             self.init_audio_input()
-        if control.cfg['audio_output']:
+        if self.cfg['audio_output']:
             self.init_audio_output()
-        if control.cfg['video_input']:
+        if self.cfg['video_input']:
             self.init_video_input(control.cfg['selected_cameras'])
-        if control.cfg['remote']:
+        if self.cfg['remote']:
             self.init_remote()
 
     def init_audio_output(self):
@@ -78,10 +78,7 @@ class Devices(QtCore.QObject):
         else:
             if not camera_modules['opencv']:
                 sys.exit('No OpenCV-cameras found')
-            camera_device_search_range = range(1, 3)
-
-            # camera_device_search_range = self.control.selected_cameras
-            # camera_device_search_range = [0, 1, 2]
+            camera_device_search_range = self.cfg["selected_cameras"]
             camera_name_format = 'cv_camera%02i'
             cams = [CvCamera(self.control, device_no=i) for i in camera_device_search_range]
             tmp = [cam for cam in cams if cam.is_working()]

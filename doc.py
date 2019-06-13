@@ -13,12 +13,12 @@ to be added
 
 
 == OPTIONS ==
-"--output_directory", "-o"      records to selected destination         ./beeye.py -o /Volumes/Disk1/trotlfolder
-"--stop_time", "-s"             terminates recording at selected time   ./beeye.py -s 01:30:20  stops in 1h 30 min 20s
-"--farbe", "-f"                 record and display in color             ./beeye.py -f     records in camera
-"--selected_cameras", "-k"      activate selected cameras only.         ./beeye.py -k 012 activates cameras 0, 1 and 2
-"--remote", "-r"                activate remote connection to wind tunnel
-"--audio", "-a"                 activates audio recording via selected channel ./beeye.py -a 0 records from audio channel 0
-"--srate", "-sr"                sets sound sample rate                  ./beeye.py -sr 16000 samples at 16 kHz. Default is 48000
-"--frate", "-fps"               sets frame rate                         ./beeye.py -fps 30 Default is 20
+--output_directory, -o  \n\trecords to selected destination         \n\t./beeye.py -o /Volumes/Disk1/trotlfolder\n
+--stop_time, -s         \n\tterminates recording at selected time   \n\t./beeye.py -s 01:30:20  stops in 1h 30 min 20s\n
+--farbe, -f             \n\trecord and display in color             \n\t./beeye.py -f \n
+--remote, -r            \n\tactivate remote connection to wind tunnel
+--audio, -a             \n\tactivates audio recording on selected channel \n\t./beeye.py -a 0   records from audio channel 0\n
+--srate, -sr            \n\tsets sound sample rate                  \n\t./beeye.py -sr 16000    samples at 16 kHz. \n\tDefault is 48000\n
+--frate, -fps           \n\tsets frame rate                         \n\t./beeye.py -fps 30      \n\tDefault is 20\n
+--camera, -c            \n\tselect camera search range              \n\t./beeye.py -c 0 1 2 5   \n\tDefault is 0\n
 '''

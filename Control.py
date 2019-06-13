@@ -16,6 +16,7 @@ from doc import doc, details
 cfg = dict(video_input=True,
            video_fps = 20,
            video_color = False,
+           video_xy = (1280, 800),
            audio_input=False,
            audio_input_index=[],
            audio_output=False,
@@ -32,7 +33,7 @@ cfg = dict(video_input=True,
            scheduled_restarts=True,
            scheduled_restarts_interval=15,
            idle_screen=True,
-           selected_cameras=[1, 2], # add number of cameras search range.
+           selected_cameras=[0], # add number of cameras search range.
            remote=False)
 
 
@@ -122,7 +123,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--audio_playback", "-u", action="store", type=str, dest="audio_playback", default='')
         parser.add_argument("--audio_playback_list", "-l", action="store", type=str, dest="audio_playback_list", default='')
         parser.add_argument("--devices", "-d", action="store_true", dest="show_devices", default=False)
-        parser.add_argument("--audio_channels", "-c", action="store", type=int, dest="audio_channels", default=1)
+        parser.add_argument("--audio_channels", "-ch", action="store", type=int, dest="audio_channels", default=1)
         parser.add_argument("--stop_time", "-s", action="store", type=str, dest="stop_time", default='')
         parser.add_argument("--farbe", "-f", action="store_true", dest="color", default=False)
         parser.add_argument("--selected_cameras", "-k", action="store", type=str, dest="selected_cameras", default='0')
@@ -131,6 +132,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--remote", "-r", action="store_true", dest="remote", default=False)
         parser.add_argument("--srate", "-sr", action="store", type=int, dest="srate", default=48000)
         parser.add_argument("--frate", "-fps", action="store", type=int, dest="frate", default=20)
+        parser.add_argument("--camera", "-c", action="store", type=int, nargs="+", dest="cam_range", default=0)
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -213,10 +215,6 @@ class Control(QtCore.QObject):
             self.color = True
             self.cfg["video_color"] = True
 
-        if self.options.selected_cameras:
-            # self.cfg["selected_cameras"] = list(map(int, list(self.options.selected_cameras)))
-            self.cfg["selected_cameras"] = [0, 1, 2]
-
         if self.options.remote:
             self.cfg["remote"] = True
 
@@ -225,6 +223,9 @@ class Control(QtCore.QObject):
 
         if self.options.frate:
             self.cfg["video_fps"] = self.options.frate
+
+        if self.options.cam_range:
+            self.cfg["selected_cameras"] = self.options.cam_range
 
     def triggered_start(self):
         # start new recording session

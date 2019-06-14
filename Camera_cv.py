@@ -3,7 +3,6 @@ import warnings
 from collections import deque
 from datetime import datetime
 
-import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
 from matplotlib.dates import date2num
@@ -38,9 +37,7 @@ class Camera(QtCore.QObject):
 
         self.control = control
         self.filename = 'video'
-        self.framerate = control.cfg["video_fps"]
         self.triggered = False
-        self.color = control.cfg["video_color"]
         self.capture = None
         self.device_no = device_no
         self.name = None
@@ -49,8 +46,10 @@ class Camera(QtCore.QObject):
         if post_processor is None:
             self.post_processor = lambda *args: args
 
-        self.width = control.cfg["video_xy"][0]
-        self.height = control.cfg["video_xy"][1]
+        self.width = self.control.cfg["video_xy"][0]
+        self.height = self.control.cfg["video_xy"][1]
+        self.framerate = self.control.cfg["video_fps"]
+        self.color = self.control.cfg["video_color"]
 
         self.saving = False
 
@@ -59,7 +58,7 @@ class Camera(QtCore.QObject):
         self.dispframe = None
 
         self.open()
-        self.empty_frame = np.zeros((np.int(self.height), np.int(self.width), np.int(3)))
+        # self.empty_frame = np.zeros((np.int(self.height), np.int(self.width), np.int(3)))
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
@@ -75,16 +74,12 @@ class Camera(QtCore.QObject):
 
         self.capture = cv2.VideoCapture(self.device_no)
 
-        # TODO: fix arbitrary camera sizes
-        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-        # self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
-        # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
-        self.capture.set(cv2.CAP_PROP_FPS, int(self.framerate))
-        # self.capture.set(5, 60)
-        self.capture.set(3, int(self.width))
-        self.capture.set(4, int(self.height))
+        """ set fps, width, height and turn autofocus off """
+        self.capture.set(5, self.framerate)
+        self.capture.set(3, self.width)
+        self.capture.set(4, self.height)
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
+        pass
 
     def is_working(self):
         return self.capture.isOpened()

@@ -229,7 +229,7 @@ class Control(QtCore.QObject):
             self.cfg["selected_cameras"] = self.options.cam_range
 
         if self.options.cam_range:
-            self.cfg["videlo_xy"] = self.options.video_xy
+            self.cfg["video_xy"] = self.options.video_xy
 
     def triggered_start(self):
         # start new recording session

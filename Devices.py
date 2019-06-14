@@ -26,8 +26,7 @@ class Devices(QtCore.QObject):
     cam_properties = OrderedDict()
     camera_threads = OrderedDict()
 
-    def __init__(self, control, parent=None,
-            audio_input=True, audio_output=False, video_input=False):
+    def __init__(self, control, parent=None):
         QtCore.QObject.__init__(self, parent)
 
         self.control = control

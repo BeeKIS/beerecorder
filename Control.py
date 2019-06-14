@@ -16,7 +16,7 @@ from doc import doc, details
 cfg = dict(video_input=True,
            video_fps = 20,
            video_color = False,
-           video_xy = (1280, 800),
+           video_xy = [1280, 720],
            audio_input=False,
            audio_input_index=[],
            audio_output=False,
@@ -133,6 +133,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--srate", "-sr", action="store", type=int, dest="srate", default=48000)
         parser.add_argument("--frate", "-fps", action="store", type=int, dest="frate", default=20)
         parser.add_argument("--camera", "-c", action="store", type=int, nargs="+", dest="cam_range", default=0)
+        parser.add_argument("--video_xy", "-xy", action="store", type=int, nargs="+", dest="video_xy")
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -226,6 +227,9 @@ class Control(QtCore.QObject):
 
         if self.options.cam_range:
             self.cfg["selected_cameras"] = self.options.cam_range
+
+        if self.options.cam_range:
+            self.cfg["videlo_xy"] = self.options.video_xy
 
     def triggered_start(self):
         # start new recording session

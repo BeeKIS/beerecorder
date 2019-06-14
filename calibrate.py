@@ -51,9 +51,3 @@ class FitSpeed(QtCore.QObject):
     def look_up_min_speed(self):
 
         return self.calib_data.loc[0, "speed"]
-
-#
-# if __name__ == "__main__":
-#
-#     fs = FitSpeed("./calibrations/calibrationKV410.csv")
-#     fs.look_up(500)

@@ -1,7 +1,6 @@
 import cv2
 import warnings
 from collections import deque
-# import PIL.Image as image
 from datetime import datetime
 
 import numpy as np
@@ -29,7 +28,7 @@ class Camera(QtCore.QObject):
     sig_set_timestamp = pyqtSignal(object)
     sig_raise_error = pyqtSignal(object)
 
-    def __init__(self, control, device_no=0, color=False, post_processor=None, parent=None):
+    def __init__(self, control, device_no=0, post_processor=None, parent=None):
         """
         Initializes a new camera
         :param post_processor: function that is applies to the frame after grabbing
@@ -50,9 +49,8 @@ class Camera(QtCore.QObject):
         if post_processor is None:
             self.post_processor = lambda *args: args
 
-        self.width = 1280
-        self.height = 720
-        # self.timer = QtCore.QTimer()
+        self.width = control.cfg["video_xy"][0]
+        self.height = control.cfg["video_xy"][1]
 
         self.saving = False
 
@@ -84,8 +82,8 @@ class Camera(QtCore.QObject):
         # self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
         self.capture.set(cv2.CAP_PROP_FPS, int(self.framerate))
         # self.capture.set(5, 60)
-        self.width = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.height = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.capture.set(3, int(self.width))
+        self.capture.set(4, int(self.height))
         self.capture.set(cv2.CAP_PROP_AUTOFOCUS, 0)
 
     def is_working(self):

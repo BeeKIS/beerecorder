@@ -1,5 +1,6 @@
 import socket
 from collections import deque
+from datetime import datetime
 
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
@@ -125,6 +126,12 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         # self.main.control.threads.append(self.threadDisp)
         # self.threadDisp.start()
 
+    def wind_timestamp(self):
+
+        timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+        self.source.control.set_timestamp(s)
+
     def clicked_connect(self):
 
         self.pwSettings = str(self.calib.look_up_arm()) + "-" \
@@ -134,6 +141,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.connection_status.setText("Connected\n")
         self.wind_speed.setText("Wind speed: 0 m/s")
         self.speed = 0
+        timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+        self.source.control.set_timestamp(s)
 
     def clicked_disconnect(self):
         self.source.disconnect_remote()
@@ -147,12 +157,18 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.wind_speed.setText("Wind speed: 0 m/s")
         print("stop")
         self.speed = 0
+        timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+        self.source.control.set_timestamp(s)
 
     def clicked_start_wind(self):
         self.source.send_command(str(self.calib.look_up_min_pw()))
         self.wind_speed.setText("Wind speed: 0 m/s")
         print("start")
         self.speed = 0
+        timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+        s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+        self.source.control.set_timestamp(s)
 
     def clicked_accelerate_major(self):
 
@@ -163,6 +179,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif (self.speed <= self.calib.look_up_max_speed()) & (self.speed > self.calib.look_up_max_speed() - 0.5):
 
@@ -171,11 +190,17 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif self.speed == self.calib.look_up_max_speed():
             print("reached maximum speed")
             self.speed = np.round(self.speed, 2)
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
             # self.connection_status.setText("Maximum speed reached\n")
 
     def clicked_deccelerate_major(self):
@@ -187,6 +212,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif (self.speed >= self.calib.look_up_min_speed()) & (self.speed < self.calib.look_up_min_speed() + 0.5):
 
@@ -195,12 +223,18 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif self.speed == self.calib.look_up_min_speed():
 
             print("reached minimum speed")
             self.speed = np.round(self.speed, 2)
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
     def clicked_deccelerate_minor(self):
         # self.control.accelerate()
@@ -212,6 +246,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif (self.speed >= self.calib.look_up_min_speed()) & (self.speed < self.calib.look_up_min_speed() + 0.1):
 
@@ -220,12 +257,18 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif self.speed == self.calib.look_up_min_speed():
 
             print("reached minimum speed")
             self.speed = np.round(self.speed, 2)
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
     def clicked_accelerate_minor(self):
 
@@ -236,6 +279,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif (self.speed <= self.calib.look_up_max_speed()) & (self.speed > self.calib.look_up_max_speed() - 0.1):
 
@@ -244,12 +290,18 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             print(self.calib.look_up_pw(self.speed))
             self.source.send_command(str(self.calib.look_up_pw(self.speed)))
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
         elif self.speed == self.calib.look_up_max_speed():
             print("reached maximum speed")
             self.speed = np.round(self.speed, 2)
             self.wind_speed.setText("Wind speed: " + str(self.speed) + " m/s")
             # self.connection_status.setText("Maximum speed reached\n")
+            timestamp = datetime.now().strftime("%Y-%m-%d  %H:%M:%S")
+            s = '{} \t {} \t {} \t{}'.format(timestamp, "Wind speed: ", str(self.speed), " m/s")
+            self.source.control.set_timestamp(s)
 
     def connection_error(self, eMsg):
         self.connection_status.setText(eMsg[0])

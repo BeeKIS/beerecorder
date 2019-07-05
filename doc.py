@@ -21,5 +21,5 @@ to be added
 --srate, -sr            \n\tsets sound sample rate                  \n\t./beeye.py -sr 16000    samples at 16 kHz. \n\tDefault is 48000\n
 --frate, -fps           \n\tsets frame rate                         \n\t./beeye.py -fps 30      \n\tDefault is 20\n
 --camera, -c            \n\tselect camera search range              \n\t./beeye.py -c 0 1 2 5   \n\tDefault is 0\n
---video_xy, -xy         \n\tdefine frame dimension                  \n\t./beeye.py -xy 800 600   \n\tDefault is 1280x720\n
+--video_xy, -xy         \n\tdefine frame dimension                  \n\t./beeye.py -xy 800 600  \n\tDefault is 1280x720\n
 '''

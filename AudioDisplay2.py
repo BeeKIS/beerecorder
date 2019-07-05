@@ -42,6 +42,7 @@ class SpectrogramWidget(pg.PlotWidget):
         self.img.scale((1. / self.audio_samplerate) * self.chunksize, yscale)
         self.setLabel('left', 'Frequency', units='Hz')
         self.win = np.hanning(self.chunksize)
+        # self.setYRange(0, 0.5)
         self.show()
 
         """ buffer for sound """

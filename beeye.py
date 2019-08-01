@@ -30,7 +30,9 @@ In majority based on "Datarecorder" of Jorg Henniger and "Videorecorder" of Bend
 The recorder is meant for parallel recording of video streams and single audio stream. It also provides possibility of 
 audio stimulation.
 
-There is also a possibility of remotely connecting to another system, for example RPi via socks.
+There is also a possibility of remotely connecting to another system, for example RPi via socks. 
+
+Additionally, there is also a possibilty of simple flight arena projection via second monitor/projector
 
 
 """

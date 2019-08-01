@@ -51,6 +51,7 @@ class ProjectorWindow():#pg.GraphicsWindow):
         self.timer.timeout.connect(self.update)
         # self.timer.start(10)
 
+
     """ get pattern ready (hist) """
     def pattern_gen_histogram_bw(self):
         self.y = np.zeros(1200)

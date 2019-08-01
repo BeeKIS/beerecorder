@@ -1,9 +1,9 @@
 import os
-from PIL import Image
 from datetime import datetime
+
+from PIL import Image
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt
-from itertools import compress
 
 
 class VideoTab(QtWidgets.QWidget):
@@ -35,27 +35,27 @@ class VideoTab(QtWidgets.QWidget):
         videoOptionLayout.addWidget(self.framerate_counter)
 
         # checkbox for coarse and high display quality
-        self.quality_checkbox = QtWidgets.QCheckBox('High Res display', self)
+        self.quality_checkbox = QtWidgets.QCheckBox('HiRes display', self)
         videoOptionLayout.addWidget(self.quality_checkbox)
         self.quality_checkbox.stateChanged.connect(self.canvas.set_display_quality)
         # self.connect(self.quality_checkbox, QtCore.SIGNAL('toggled()'), self.canvas.set_display_quality)
 
         # checkbox for exclusion of cameras from recording
-        self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera', self)
-        videoOptionLayout.addWidget(self.exclude_cam_checkbox, QtCore.Qt.AlignRight)
-        self.exclude_cam_checkbox.stateChanged.connect(self.exclude_cam)
+        # self.exclude_cam_checkbox = QtWidgets.QCheckBox('Exclude camera', self)
+        # videoOptionLayout.addWidget(self.exclude_cam_checkbox, QtCore.Qt.AlignRight)
+        # self.exclude_cam_checkbox.stateChanged.connect(self.exclude_cam)
 
         # set framerate
         # ...
 
         # modify ROI button
-        self.roi_button = QtWidgets.QPushButton('Modify ROI')
-        videoOptionLayout.addWidget(self.roi_button)
-        self.roi_button.clicked.connect(self.modify_roi)
+        # self.roi_button = QtWidgets.QPushButton('Modify ROI')
+        # videoOptionLayout.addWidget(self.roi_button)
+        # self.roi_button.clicked.connect(self.modify_roi)
         # connection
 
         # photo button
-        self.photo_button = QtWidgets.QPushButton('Snapshot!')
+        self.photo_button = QtWidgets.QPushButton('Photo!')
         videoOptionLayout.addWidget(self.photo_button)
         self.photo_button.clicked.connect(self.canvas.save_photo)
         # connection
@@ -68,15 +68,15 @@ class VideoTab(QtWidgets.QWidget):
 
     def modify_roi(self):
         pass
-
-    def exclude_cam(self):
-
-        if self.main.control.cam_exclude[self.cam_name] == 0:
-            self.main.control.cam_exclude[self.cam_name] = 1
-            print('excluded camera: ', self.cam_name)
-        else:
-            self.main.control.cam_exclude[self.cam_name] = 0
-            print('re-included camera: ', self.cam_name)
+    #
+    # def exclude_cam(self):
+    #
+    #     if self.main.control.cam_exclude[self.cam_name] == 0:
+    #         self.main.control.cam_exclude[self.cam_name] = 1
+    #         print('excluded camera: ', self.cam_name)
+    #     else:
+    #         self.main.control.cam_exclude[self.cam_name] = 0
+    #         print('re-included camera: ', self.cam_name)
 
 
 class VideoCanvas(QtWidgets.QLabel):

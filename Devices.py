@@ -41,6 +41,8 @@ class Devices(QtCore.QObject):
             self.init_video_input(control.cfg['selected_cameras'])
         if self.cfg['remote']:
             self.init_remote()
+        if self.cfg['projector']:
+            self.init_projector()
 
     def init_audio_output(self):
         # Audio Output
@@ -119,8 +121,9 @@ class Devices(QtCore.QObject):
         self.control.threads.append(self.threadRemote)
         self.threadRemote.start()
 
-            # self.control.sig_remote_connect.connect(self.remote_connect.connect)
-            # print('remote connected initialized')
+    def init_projector(self):
+
+        pass
 
     def init_audio_input(self):
         # Audio Input

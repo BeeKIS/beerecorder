@@ -16,6 +16,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from AudioDisplay import AudioDisplay
 from AudioDisplay2 import SpectrogramWidget
 from Control import Control
+from FlightProjector import ProjectorWindow, ProjectorControl
 from Remote import RemoteDisplay
 from VideoCanvas import VideoTab
 
@@ -51,6 +52,7 @@ class Main(QtWidgets.QMainWindow):
     offset_top = 30
     max_tab_width = 1000
     min_tab_width = 480
+    audio_height = 200
 
     # HANDLES
     idle_screen = False
@@ -105,16 +107,27 @@ class Main(QtWidgets.QMainWindow):
             self.init_audio_out_display()
         if self.control.cfg['remote']:
             self.init_remote_layout()
+        if self.control.cfg['projector']:
+            self.init_projector_layout()
 
         # add control: buttons and info
         self.init_control_layout()
         # create keyboard shortcuts
         self.create_actions()
 
+    def init_projector_layout(self):
+        # SEPARATE WINDOW
+        self.projector = ProjectorWindow(self, self.control, "Flight projector")
+        self.width += 200
+        self.projector_layout = ProjectorControl(self, self.control.devices.remote, "Projector control")
+        self.video_layout.addWidget(self.projector_layout, alignment=Qt.AlignRight)
+
+        pass
+
     def init_audio_in_display(self):
         # AUDIO DISPLAY
         self.height += 200
-        self.audio_layout = QtWidgets.QVBoxLayout()
+        self.audio_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.audio_layout)
         # self.audio_disp = AudioDisplay(self, self.control.devices.audiodev, 'Audio Input',
         #     samplerate=self.control.cfg['audio_input_samplerate'])
@@ -124,6 +137,7 @@ class Main(QtWidgets.QMainWindow):
                                             chunks=self.control.cfg['audio_input_chunksize'])
 
         self.audio_layout.addWidget(self.audio_disp)
+        # self.main_layout.addWidget(self.audio_disp)
 
     def init_audio_out_display(self):
         self.height += 200
@@ -143,18 +157,22 @@ class Main(QtWidgets.QMainWindow):
         self.main_layout.addLayout(self.bottom_info_layout)
 
         # POPULATE BOTTOM LAYOUT
-        self.button_record = QtWidgets.QPushButton('Start Recording')
+        self.button_record = QtWidgets.QPushButton('Record')
+        self.button_record.setMaximumWidth(100)
         self.button_stop = QtWidgets.QPushButton('Stop')
+        self.button_stop.setMaximumWidth(100)
         self.button_tag = QtWidgets.QPushButton('&Comment')
+        self.button_tag.setMaximumWidth(100)
         self.button_idle = QtWidgets.QPushButton('Pause Display')
+        self.button_idle.setMaximumWidth(120)
 
         self.button_stop.setDisabled(True)
         self.button_tag.setDisabled(True)
 
-        self.button_record.setMinimumHeight(50)
-        self.button_stop.setMinimumHeight(50)
-        self.button_tag.setMinimumHeight(50)
-        self.button_idle.setMinimumHeight(50)
+        self.button_record.setMinimumHeight(45)
+        self.button_stop.setMinimumHeight(45)
+        self.button_tag.setMinimumHeight(45)
+        self.button_idle.setMinimumHeight(45)
 
         self.bottom_layout.addWidget(self.button_record)
         self.bottom_layout.addWidget(self.button_stop)
@@ -168,9 +186,11 @@ class Main(QtWidgets.QMainWindow):
         self.label_time.setText(self.control.default_label_text)
         self.control.sig_info_update.connect(self.update_info)
 
-        self.bottom_info_layout.addStretch(0)
-        self.bottom_info_layout.addWidget(self.label_time)
-        self.bottom_info_layout.addStretch(0)
+        # self.bottom_info_layout.addStretch(0)
+        # self.bottom_info_layout.addWidget(self.label_time)
+        # self.bottom_info_layout.addStretch(0)
+        self.bottom_layout.addWidget(self.label_time)
+        self.bottom_layout.setAlignment(Qt.AlignLeft)
 
         # connect buttons
         self.button_record.clicked.connect(self.clicked_start)
@@ -181,7 +201,7 @@ class Main(QtWidgets.QMainWindow):
     def init_video_display(self):
         self.video_layout = QtWidgets.QHBoxLayout()
         self.main_layout.addLayout(self.video_layout)
-        self.height += 500
+        self.height += 450
 
         # POPULATE TOP LAYOUT
         self.videos = QtWidgets.QTabWidget()
@@ -352,7 +372,8 @@ class Main(QtWidgets.QMainWindow):
             self.video_tabs[cam_name].canvas.setImage(frame)
             
             self.last_framerate = fr
-            self.video_tabs[cam_name].framerate_counter.setText('Framerate:\n{:.1f} Hz'.format(fr))
+            # self.video_tabs[cam_name].framerate_counter.setText('Framerate:\n{:.1f} Hz'.format(fr))
+            self.video_tabs[cam_name].framerate_counter.setText('{:.1f} fps'.format(fr))
 
     def update_video_skipstep(self, val):
         self.mutex.lock()

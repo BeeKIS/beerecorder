@@ -38,8 +38,7 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.source = source
 
         # ##############################
-
-        self.name = name
+        # self.name = name
         self.main = main
 
         self.pwSettings = ""
@@ -55,9 +54,9 @@ class RemoteDisplay(QtWidgets.QGroupBox):
 
         #   information board
         self.connection_status = QtWidgets.QLabel()
-        self.connection_status.setText("Disconnected\n")
+        self.connection_status.setText("Status:\Disconnected")
         self.wind_speed = QtWidgets.QLabel()
-        self.wind_speed.setText("Wind speed: 0 m/s")
+        self.wind_speed.setText("Wind speed:\n0 m/s")
 
         # remote buttons
         self.button_connect = QtWidgets.QPushButton('Connect')
@@ -71,31 +70,23 @@ class RemoteDisplay(QtWidgets.QGroupBox):
         self.button_deccelerate_major = QtWidgets.QPushButton('- 0.5 m/s')
 
         self.button_connect.setMaximumHeight(50)
-        self.button_connect.setMinimumWidth(150)
+        self.button_connect.setMinimumWidth(120)
         self.button_disconnect.setMaximumHeight(50)
-        self.button_disconnect.setMinimumWidth(150)
+        self.button_disconnect.setMinimumWidth(120)
         # self.button_arm_wind.setMaximumHeight(50)
         # self.button_arm_wind.setMinimumWidth(150)
         self.button_start_wind.setMaximumHeight(50)
-        self.button_start_wind.setMinimumWidth(150)
+        self.button_start_wind.setMinimumWidth(120)
         self.button_stop_wind.setMaximumHeight(50)
-        self.button_stop_wind.setMinimumWidth(150)
+        self.button_stop_wind.setMinimumWidth(120)
         self.button_accelerate_minor.setMaximumHeight(50)
-        self.button_accelerate_minor.setMinimumWidth(150)
+        self.button_accelerate_minor.setMinimumWidth(120)
         self.button_deccelerate_minor.setMaximumHeight(50)
-        self.button_deccelerate_major.setMinimumWidth(150)
-        self.button_accelerate_major.setMaximumHeight(50)
-        self.button_accelerate_major.setMinimumWidth(150)
+        self.button_deccelerate_major.setMinimumWidth(120)
         self.button_deccelerate_major.setMaximumHeight(50)
-        self.button_deccelerate_major.setMinimumWidth(150)
-
-        self.button_disconnect.setDisabled(True)
-        # self.button_arm_wind.setDisabled(True)
-        self.button_start_wind.setDisabled(True)
-        self.button_stop_wind.setDisabled(True)
-        self.button_accelerate_major.setDisabled(True)
-        self.button_deccelerate_major.setDisabled(True)
-        self.button_accelerate_minor.setDisabled(True)
+        self.button_deccelerate_minor.setMinimumWidth(120)
+        self.button_accelerate_major.setMaximumHeight(50)
+        self.button_accelerate_major.setMinimumWidth(120)
         self.button_deccelerate_minor.setDisabled(True)
 
         self.layout().addWidget(self.connection_status)
@@ -318,6 +309,16 @@ class RemoteDisplay(QtWidgets.QGroupBox):
             self.wind_speed.setText("Wind speed: " + str(0.0) + " m/s")
         else:
             self.wind_speed.setText("Wind speed: " + str(self.calib.look_up(value)) + " m/s")
+        self.button_deccelerate_major.setMaximumHeight(50)
+        self.button_deccelerate_major.setMinimumWidth(120)
+
+        self.button_disconnect.setDisabled(True)
+        # self.button_arm_wind.setDisabled(True)
+        self.button_start_wind.setDisabled(True)
+        self.button_stop_wind.setDisabled(True)
+        self.button_accelerate_major.setDisabled(True)
+        self.button_deccelerate_major.setDisabled(True)
+        self.button_accelerate_minor.setDisabled(True)
 
 
 class Remote(QtCore.QObject):

@@ -23,6 +23,7 @@ cfg = dict(video_input=True,
            audio_input_channels=1,
            audio_input_samplerate=48000,
            audio_input_chunksize=512,
+           projector=False,
            use_hydro=False,
            # use_hydro=True,
            audio_output_chunksize=2048,
@@ -134,6 +135,7 @@ class Control(QtCore.QObject):
         parser.add_argument("--frate", "-fps", action="store", type=int, dest="frate", default=20)
         parser.add_argument("--camera", "-c", action="store", type=int, nargs="+", dest="cam_range", default=0)
         parser.add_argument("--video_xy", "-xy", action="store", type=int, nargs="+", dest="video_xy")
+        parser.add_argument("--projector", "-p", action="store_true", dest="projector", default=False)
         self.options = parser.parse_args()
 
         # self.options.audio_playback_list = 'playback_files.txt'
@@ -230,6 +232,9 @@ class Control(QtCore.QObject):
 
         if self.options.cam_range:
             self.cfg["video_xy"] = self.options.video_xy
+
+        if self.options.projector:
+            self.cfg["projector"] = self.options.projector
 
     def triggered_start(self):
         # start new recording session

@@ -30,7 +30,7 @@ class RemoteDisplay(QtWidgets.QGroupBox):
     def __init__(self, main, source, name):
         QtWidgets.QGroupBox.__init__(self, name)
 
-        self.calib_fn = "./calibrations/calibrationKV410.csv"
+        self.calib_fn = "./calibrations/calibrationKV410_14_8.csv"
         self.calib = FitSpeed(self.calib_fn)
 
         # generate layout

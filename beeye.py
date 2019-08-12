@@ -208,8 +208,9 @@ class Main(QtWidgets.QMainWindow):
 
         # POPULATE TOP LAYOUT
         self.videos = QtWidgets.QTabWidget()
-        self.videos.setMinimumWidth(self.min_tab_width)
-        self.videos.setMaximumWidth(self.max_tab_width)
+        self.videos.maximumSize()
+        # self.videos.setMinimumWidth(self.min_tab_width)
+        # self.videos.setMaximumWidth(self.max_tab_width)
         self.video_recordings = None
         self.video_tabs = {}
         self.video_layout.addWidget(self.videos)

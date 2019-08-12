@@ -202,6 +202,7 @@ class Main(QtWidgets.QMainWindow):
 
     def init_video_display(self):
         self.video_layout = QtWidgets.QHBoxLayout()
+        self.video_layout.maximumSize()
         self.main_layout.addLayout(self.video_layout)
         self.height += 450
 

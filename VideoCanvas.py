@@ -10,7 +10,7 @@ class VideoTab(QtWidgets.QWidget):
     """This class creates the a Tab for Camera data"""
     def __init__(self, main, cam_name, parent=None):
         QtWidgets.QWidget.__init__(self, parent=parent)
-        #self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        # self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.cam_name = cam_name
         self.main = main
@@ -19,12 +19,14 @@ class VideoTab(QtWidgets.QWidget):
         self.setLayout(QtWidgets.QHBoxLayout())
 
         self.canvas = VideoCanvas(self.main, parent=self)
+        self.canvas.maximumSize()
         # self.layout().addStretch()    #### disable expanding
         self.layout().addWidget(self.canvas)
-        # self.layout().addStretch()    #### disable expanding
+        self.layout().maximumSize()    #### disable expanding
 
         # options layout
         videoOptionLayout = QtWidgets.QVBoxLayout()
+        videoOptionLayout.maximumSize()
         self.layout().addLayout(videoOptionLayout)
         
         # framerate indicator

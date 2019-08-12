@@ -29,28 +29,46 @@ class ProjectorWindow():#pg.GraphicsWindow):
         """ empty variables """
         self.x = None
         self.y = None
+        self.arr = None
 
         """ other variables """
         self.step = -1
         self.speed = -5
 
         """ get window ready"""
-        self.w = pg.GraphicsWindow()
-        self.w.setWindowTitle('Landscape projector')
+        # self.w = pg.GraphicsWindow()
+        # self.w.setWindowTitle('Landscape projector')
 
-        """ get plot ready """
-        self.p = self.w.addPlot()
-        self.pattern_gen_square()
-        self.curve = self.p.plot(self.x, self.y, stepMode=True, fillLevel=0, brush=(0, 125, 0, 150))
+        # """ get plot ready """
+        # self.p = self.w.addPlot()
+        # # self.pattern_gen_square()
+        # self.pattern_gen_square()
+        # self.curve = self.p.plot(self.x, self.y, stepMode=True, fillLevel=0, brush=(255, 255, 255, 255))
+        # self.update_rate = int(0)
+        # self.p.showAxis('bottom', False)
+        # self.p.showAxis('left', False)
+
+        """ get image ready """
+        self.w = pg.ImageWindow()
+        self.pattern_gen_square_noise()
+        self.w.setImage(self.arr, autoLevels=False)
+        # self.w.getHistogramWidget().hide()
+        # self.w.getRoiPlot().hide()
+        # self.w.roi.hide()
+        self.w.ui.histogram.hide()
+        self.w.ui.roiBtn.hide()
+        self.w.ui.menuBtn.hide()
+
+        # self.w.getMenuBtn().hide()
+        # self.curve = self.p.plot(self.x, self.y, stepMode=True, fillLevel=0, brush=(255, 255, 255, 255))
         self.update_rate = int(0)
-        self.p.showAxis('bottom', False)
-        self.p.showAxis('left', False)
+        # self.p.showAxis('bottom', False)
+        # self.p.showAxis('left', False)
 
         """ update frequency """
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
         # self.timer.start(10)
-
 
     """ get pattern ready (hist) """
     def pattern_gen_histogram_bw(self):
@@ -63,9 +81,27 @@ class ProjectorWindow():#pg.GraphicsWindow):
         self.y = square(2 * np.pi * 5 * self.x)[:-1]
         self.y[self.y < 0] = 0
 
+    def pattern_gen_square_noise(self):
+        ## Create image to display
+        self.arr = np.ones((400, 600), dtype=float)
+        # self.arr[45:55, 45:55] = 0
+        # self.arr[25, :] = 5
+        # self.arr[:, 25] = 5
+        # self.arr[75, :] = 5
+        # self.arr[:, 75] = 5
+        # self.arr[50, :] = 10
+        # self.arr[:, 50] = 10
+        self.arr += np.sin(np.linspace(0, 20, 600)).reshape(1, 600)
+        self.arr += np.random.normal(size=(400, 600))
+        self.arr = self.arr.T
+
     def update(self):
-        self.y = np.roll(self.y, self.speed)
-        self.curve.setData(self.x, self.y)
+        # self.y = np.roll(self.y, self.speed)
+        # self.curve.setData(self.x, self.y)
+
+        self.arr = np.roll(self.arr, self.speed, axis=0)
+        # self.p.setData(self.arr)
+        self.w.setImage(self.arr)
 
 class ProjectorControl(QtWidgets.QGroupBox):
 

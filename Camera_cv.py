@@ -3,6 +3,7 @@ import warnings
 from collections import deque
 from datetime import datetime
 
+import numpy as np
 from PyQt5 import QtCore
 from PyQt5.QtCore import pyqtSignal
 from matplotlib.dates import date2num
@@ -58,7 +59,9 @@ class Camera(QtCore.QObject):
         self.dispframe = None
 
         self.open()
-        # self.empty_frame = np.zeros((np.int(self.height), np.int(self.width), np.int(3)))
+        self.empty_frame = np.zeros((np.int(self.height), np.int(self.width), np.int(3)))
+        if self.color:
+            self.empty_frame = self.empty_frame[:, :, 0]
 
         self.sig_set_timestamp.connect(self.control.set_timestamp)
         self.sig_raise_error.connect(self.control.raise_error)
@@ -156,13 +159,15 @@ class Camera(QtCore.QObject):
         try:
             if self.color:
                 frame = brg2rgb(frame)
+                self.empty_frame = frame
             else:
                 frame = brg2grayscale(frame)
+                self.empty_frame = frame
         except:
             if self.color:
                 frame = self.empty_frame
             else:
-                frame = self.empty_frame[:, :, 0]
+                frame = self.empty_frame
 
         # DEBUG
         # gap = 1000.*(dtime - self.last_frame).total_seconds()

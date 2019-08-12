@@ -60,6 +60,17 @@ class VideoTab(QtWidgets.QWidget):
         self.photo_button.clicked.connect(self.canvas.save_photo)
         # connection
 
+        # zoom on linux
+        self.zoom_auto = QtWidgets.QCheckBox("Autofocus")
+        self.zoom_in = QtWidgets.QPushButton('Zoom in')
+        self.zoom_out = QtWidgets.QPushButton('Zoom out')
+        videoOptionLayout.addWidget(self.zoom_in)
+        videoOptionLayout.addWidget(self.zoom_out)
+        videoOptionLayout.addWidget(self.zoom_auto)
+        self.zoom_in.clicked.connect(self.canvas.save_photo)
+        self.zoom_out.clicked.connect(self.canvas.save_photo)
+
+
     def get_available_framerates(self):
         pass
 
